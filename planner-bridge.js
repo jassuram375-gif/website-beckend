@@ -97,7 +97,6 @@ authActionBtn.addEventListener('click', async () => {
     try {
         if (activeAuthMode === 'reset') {
             const cachedUser = authActionBtn.getAttribute('data-user-cache');
-            // FIX 1: Updated to live Render backend URL
             const response = await fetch('https://website-beckend.onrender.com/api/auth/reset', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -116,7 +115,6 @@ authActionBtn.addEventListener('click', async () => {
         }
 
         const endpoint = activeAuthMode === 'login' ? '/api/auth/login' : (activeAuthMode === 'register' ? '/api/auth/register' : '/api/auth/forgot');
-        // FIX 2: Updated to live Render backend URL
         const response = await fetch(`https://website-beckend.onrender.com${endpoint}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -188,8 +186,10 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         const lat = parseFloat(geoData[0].lat);
         const lon = parseFloat(geoData[0].lon);
         const resolvedName = geoData[0].display_name;
+        
+        // Grab just the clean city name for the weather module display
+        const cleanCityName = destination.charAt(0).toUpperCase() + destination.slice(1);
 
-        // FIX 3: Updated to live Render backend URL
         const response = await fetch('https://website-beckend.onrender.com/api/calculate-trip', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -199,29 +199,52 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
 
         // Display cost parameters
         costResult.innerHTML = `<strong>Customized Total:</strong> <span style="color:#10b981; font-size:18px; font-weight:700;">${data.symbol}${data.totalCost}</span>`;
-        radarStatus.innerText = "Radar Active";
+        radarStatus.innerText = "Radar Active • Telemetry Linked";
         systemNotice.innerHTML = `<strong>Location:</strong> ${resolvedName}<br><br>${data.locationNotice}`;
 
-        // RENDER WEATHER CHANNELS READOUT (Option 2)
+        // REAL-TIME WEATHER TELEMETRY CARD CLEAR DESIGN
         if (data.weather) {
             weatherContainer.style.display = 'block';
+            weatherContainer.style.background = '#f8fafc';
+            weatherContainer.style.borderLeft = '4px solid #3b82f6';
+            weatherContainer.style.padding = '14px';
+            weatherContainer.style.borderRadius = '0 8px 8px 0';
+            weatherContainer.style.marginTop = '15px';
+            
             weatherContainer.innerHTML = `
-                <strong>Live Weather Telemetry:</strong> ${data.weather.temp}°C | Clouds: ${data.weather.condition}<br>
-                <small style="color:#64748b;">Packing Index: <strong>${data.weather.advice}</strong></small>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <strong style="color: #1e293b; font-size: 14px;">🌤️ Live Climate: ${cleanCityName}</strong>
+                    <span style="background: #dbeafe; color: #1e40af; font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        ${data.weather.temp}°C
+                    </span>
+                </div>
+                <div style="color: #475569; font-size: 13px; line-height: 1.5;">
+                    <span style="display: block; margin-bottom: 4px;"><strong>Conditions:</strong> ${data.weather.condition}</span>
+                    <span style="color: #2563eb; font-weight: 500;">📌 <strong>Packing Advice:</strong> ${data.weather.advice}</span>
+                </div>
             `;
         }
 
-        // Map layout logic frame
+        // REAL-TIME SMOOTH GEOGRAPHICAL MAP SWEEP (flyTo Animation Upgrade)
         mapContainer.style.display = 'block';
         if (!globalMapInstance) {
             globalMapInstance = L.map('mapBoxContainer').setView([lat, lon], 12);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(globalMapInstance);
             globalMapMarker = L.marker([lat, lon]).addTo(globalMapInstance);
         } else {
-            globalMapInstance.setView([lat, lon], 12);
+            // Smoothly pans and glides the map over 1.6 seconds to look fully professional
+            globalMapInstance.flyTo([lat, lon], 12, {
+                animate: true,
+                duration: 1.6
+            });
             globalMapMarker.setLatLng([lat, lon]);
         }
-        globalMapInstance.invalidateSize();
+        
+        // Force rendering dimensions update smoothly following the animation frame
+        setTimeout(() => {
+            if (globalMapInstance) globalMapInstance.invalidateSize();
+        }, 450);
+
     } catch (err) {
         costResult.innerHTML = "<span style='color:red;'>Link offline. Check backend logs!</span>";
     }
