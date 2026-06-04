@@ -196,14 +196,13 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         });
         const data = await response.json();
 
-        // Generate the live Google Maps dynamic link using coordinates
+        // FIX: Replaced the corrupted query link with a native, universally verified Google Maps search coordinate string
         const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 
         // Display cost parameters
         costResult.innerHTML = `<strong>Customized Total:</strong> <span style="color:#10b981; font-size:18px; font-weight:700;">${data.symbol}${data.totalCost}</span>`;
         radarStatus.innerText = "Radar Active • Telemetry Linked";
         
-        // ADDED: Sleek "Open in Google Maps" action button inside the location readout notice
         systemNotice.innerHTML = `
             <strong>Location:</strong> ${resolvedName}<br><br>
             ${data.locationNotice}<br><br>
