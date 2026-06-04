@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Next-Gen Travel Suite Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top left, #f1f5f9 0%, #cbd5e1 100%);
+            margin: 0;
+            padding: 40px 20px;
+            display: block;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .layout-container {
+            display: block;
+            max-width: 1020px;
+            margin: 0 auto;
+        }
+
+        .header-bar {
+            background: var(--card-bg);
+            padding: 20px 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            display: block;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        .header-content {
+            display: block;
+            overflow: hidden;
+        }
+
+        .header-title {
+            float: left;
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 40px;
+        }
+
+        .controls-wrapper {
+            float: right;
+            display: block;
+        }
+
+        .lang-wrapper {
+            display: inline-block;
+            width: 140px;
+            margin-right: 15px;
+            vertical-align: middle;
+        }
+
+        .auth-toggle-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--text-main);
+            color: white;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            vertical-align: middle;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-tabs {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .auth-tab {
+            font-weight: 700;
+            font-size: 14px;
+            margin-right: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .auth-tab.active {
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--accent-blue);
+            padding-bottom: 10px;
+        }
+
+        .auth-inline-group {
+            display: inline-block;
+            margin-right: 15px;
+            width: 260px;
+            vertical-align: top;
+        }
+
+        .auth-inline-group input {
+            padding: 10px 12px;
+        }
+
+        .forgot-link-text {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--accent-blue);
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+
+        .auth-submit-btn {
+            display: inline-block;
+            width: 150px;
+            padding: 12px;
+            background-color: var(--accent-blue);
+            color: white;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .grid-wrapper {
+            display: block;
+            clear: both;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            width: 470px;
+            float: left;
+            margin-right: 30px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255,255,255,0.7);
+            margin-bottom: 30px;
+        }
+
+        .card.right-card {
+            margin-right: 0;
+            width: 520px;
+        }
+
+        h2 { 
+            color: var(--text-main); 
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 25px; 
+            border-bottom: 3px solid var(--accent-green); 
+            padding-bottom: 10px; 
+        }
+
+        .right-card h2 { border-bottom: 3px solid var(--accent-blue); }
+
+        .input-group { margin-bottom: 18px; }
+        
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        input, select { 
+            width: 100%; 
+            padding: 12px 14px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-main);
+            background-color: #f8fafc;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            background-color: #fff;
+        }
+
+        .checkbox-container {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-item {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .checkbox-item:last-child { margin-bottom: 0; }
+
+        .checkbox-item input {
+            width: auto;
+            display: inline-block;
+            margin-right: 10px;
+            transform: scale(1.1);
+        }
+
+        button.main-btn { 
+            width: 100%; 
+            padding: 14px; 
+            background-color: var(--accent-green); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 15px; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+        }
+
+        button.main-btn:hover { 
+            background-color: #059669; 
+            transform: translateY(-1px);
+        }
+
+        .result-box { 
+            margin-top: 25px; 
+            padding: 16px; 
+            background: #ecfdf5; 
+            border-left: 5px solid var(--accent-green); 
+            border-radius: 8px; 
+            display: none; 
+            font-size: 14px;
+        }
+
+        .wardrobe-section { 
+            margin-bottom: 15px;
+            border-left: 5px solid var(--accent-blue); 
+            background: #eff6ff; 
+            display: block;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        /* Live weather readout header layout */
+        .weather-badge {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: var(--text-main);
+            display: none;
+        }
+
+        #mapBoxContainer {
+            width: 100%;
+            height: 250px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid var(--border-color);
+            display: none;
+            z-index: 1;
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+    </style>
+
+    <script src="https://unpkg.com/i18next@21.6.11/i18next.min.js"></script>
+</head>
+<body>
+
+    <div class="layout-container">
+        
+        <div class="header-bar clearfix">
+            <div class="header-content">
+                <h1 class="header-title" data-i18n="app_title">Global Next-Gen Travel Suite Pro</h1>
+                <div class="controls-wrapper">
+                    <div class="lang-wrapper">
+                        <select id="languageSelector">
+                            <option value="en" selected>English</option>
+                            <option value="hi">हिन्दी (Hindi)</option>
+                            <option value="es">Español (Spanish)</option>
+                            <option value="fr">Français (French)</option>
+                            <option value="ar">العربية (Arabic)</option>
+                        </select>
+                    </div>
+                    <button class="auth-toggle-btn" id="accountMenuBtn">Sign In / Register</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-card" id="authBoxPanel">
+            <div class="auth-tabs" id="authTabsContainer">
+                <span class="auth-tab active" id="tabLogin">Existing User Login</span>
+                <span class="auth-tab" id="tabRegister">Create Global Profile</span>
+                <span class="auth-tab" id="tabRecover" style="display:none;">Account Recovery</span>
+            </div>
+            
+            <div class="clearfix" style="overflow: hidden;">
+                <div class="auth-inline-group" id="containerUsername">
+                    <label id="lblUsername">Account Username / Email:</label>
+                    <input type="text" id="authUsername" placeholder="e.g., krish_kumar">
+                </div>
+                
+                <div class="auth-inline-group" id="containerPassword">
+                    <label id="lblPassword">Account Secure Password:</label>
+                    <input type="password" id="authPassword" placeholder="••••••••">
+                    <span class="forgot-link-text" id="forgotPasswordLink">Forgot Password?</span>
+                </div>
+                
+                <div class="auth-inline-group" style="width: auto; padding-top: 25px;">
+                    <button class="auth-submit-btn" id="authActionBtn">Execute Login</button>
+                </div>
+            </div>
+            <div id="authStatusAlert" style="margin-top:15px; font-size:13px; font-weight:600; display:none; color: #2563eb;"></div>
+        </div>
+
+        <div class="grid-wrapper clearfix">
+            
+            <div class="card">
+                <h2 data-i18n="form_title">Configure Parameters</h2>
+                
+                <div class="input-group">
+                    <label data-i18n="label_dest">Enter Global Destination:</label>
+                    <input type="text" id="destination" value="Moradabad">
+                </div>
+                
+                <div class="input-group">
+                    <label data-i18n="label_days">Number of Days:</label>
+                    <input type="number" id="days" value="5">
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="label_customize">Customize Your Package Add-ons:</label>
+                    <div class="checkbox-container">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="addFlight" value="flight" checked> <span data-i18n="pack_flights">Roundtrip Flights Included</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="addHotel" value="hotel" checked> <span data-i18n="pack_hotel">5-Star Luxury Stay Upgrade</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="addGuide" value="guide"> <span data-i18n="pack_guide">Private Local Culinary Guide</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="addInsurance" value="insurance"> <span data-i18n="pack_insurance">Worldwide Medical Insurance</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="label_currency">Target Display Currency:</label>
+                    <select id="currency">
+                        <option value="INR" selected>INR (₹)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="AED">AED (د.إ)</option>
+                    </select>
+                </div>
+
+                <button class="main-btn" id="calculateBtn" data-i18n="btn_calculate">Process Global Matrix</button>
+                
+                <div id="costResult" class="result-box"></div>
+            </div>
+
+            <div class="card right-card">
+                <h2 data-i18n="radar_title">Geographical Radar</h2>
+                
+                <div class="weather-badge" id="weatherTelemetryContainer"></div>
+
+                <div id="mapBoxContainer"></div>
+
+                <div id="dynamicWardrobe" class="result-box wardrobe-section" style="display:block; margin-top:25px;">
+                    <strong id="radarStatus" data-i18n="radar_await">Awaiting System Input Coordinates...</strong>
+                    <p id="systemNotice" style="font-size: 13px; color: var(--text-muted);" data-i18n="radar_desc">Select your target language, enter any worldwide destination, choose your package criteria, and run the engine calculation matrix.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="planner-bridge.js"></script>
+</body>
+</html>

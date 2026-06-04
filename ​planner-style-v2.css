@@ -1,0 +1,134 @@
+/* Base Reset and Typography */
+body {
+    background-color: #f4f6f9;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.planner-container {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-top: 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #3182ce;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.submit-button:hover {
+    background-color: #2b6cb0;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 30px 0;
+}
+
+/* Premium Results Dashboard Card */
+.results-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.results-title {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 8px;
+}
+
+/* Individual Data Rows */
+.result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 8px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.result-item:hover {
+    background: #f7fafc;
+}
+
+/* Icon Badges */
+.result-item .icon {
+    font-size: 1.3rem;
+    margin-right: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: #ebf8ff;
+    border-radius: 50%;
+}
+
+/* Sharp Typography */
+.item-text {
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.item-text strong {
+    color: #1a202c;
+    font-weight: 600;
+}
+
+/* Smart Warning System Component */
+.warning-popup {
+    background-color: #fff9db;
+    border-left: 5px solid #f59f00;
+    color: #f08c00;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    font-size: 0.9rem;
+}
