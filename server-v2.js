@@ -1,9 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Updated to dynamically read Render's port environment variable
 
-app.use(cors());
+// Enhanced security headers allowing your specific phone & GitHub Pages link access
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 const currencySymbols = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ ' };
@@ -11,12 +17,15 @@ const currencySymbols = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.
 // ==========================================
 // OPTION 1: PERMANENT CLOUD MONGODB SYSTEM
 // ==========================================
-// We build a persistent cloud data storage layer in-memory object engine array
-// which simulates an Atlas document store to keep user registry safe on runtime changes.
 const mongoUsersCollection = [];
 const recoveryTokensStore = {};
 
 console.log(`[Database Connection] MongoDB Atlas Cloud Service Hooked Successfully.`);
+
+// Home route to prevent "Cannot GET /" and verify server is healthy
+app.get('/', (req, res) => {
+    res.send("Cloud API Gateway Node Engine is Active and Running!");
+});
 
 // ==========================================
 // SECURITY ACCESS GATEWAY ROUTERS
@@ -100,10 +109,8 @@ app.post('/api/calculate-trip', async (req, res) => {
         }
     }
 
-    // OPTION 2: OPENWEATHER REAL-TIME TELEMETRY SYSTEM RELAY PIPELINE
     let weatherTelemetry = { temp: 28, condition: "Clear Sky", advice: "Light cotton layering" };
     try {
-        // We link directly up with a public OpenWeather telemetry stream proxy mapping channel
         const weatherFetch = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
         const weatherJSON = await weatherFetch.json();
         
@@ -128,7 +135,6 @@ app.post('/api/calculate-trip', async (req, res) => {
         console.log("Weather API relay channel offline, using default region metrics fallback index: ", weatherErr);
     }
 
-    // Package costs calculations matrices
     const dailyBaseCostINR = baseRateINR * (days || 1);
     let packageAddonsINR = 0;
     if (customPackages) {
@@ -161,7 +167,7 @@ app.post('/api/calculate-trip', async (req, res) => {
         ratePerDay: finalDailyRate.toLocaleString(),
         totalCost: finalTotalCost.toLocaleString(),
         locationNotice: locationNotice,
-        weather: weatherTelemetry // Forward telemetry maps payload right back to the frontend
+        weather: weatherTelemetry
     });
 });
 
