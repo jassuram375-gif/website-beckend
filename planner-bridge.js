@@ -196,7 +196,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         });
         const data = await response.json();
 
-        // FIXED: Universal dynamic string construction for real Google Maps redirects
+        // FIXED: Replaced corrupted syntax with true template literals for real-time accuracy
         const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 
         // Display cost parameters
