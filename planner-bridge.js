@@ -187,7 +187,6 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         const lon = parseFloat(geoData[0].lon);
         const resolvedName = geoData[0].display_name;
         
-        // Grab just the clean city name for the weather module display
         const cleanCityName = destination.charAt(0).toUpperCase() + destination.slice(1);
 
         const response = await fetch('https://website-beckend.onrender.com/api/calculate-trip', {
@@ -197,12 +196,23 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         });
         const data = await response.json();
 
+        // Generate the live Google Maps dynamic link using coordinates
+        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+
         // Display cost parameters
         costResult.innerHTML = `<strong>Customized Total:</strong> <span style="color:#10b981; font-size:18px; font-weight:700;">${data.symbol}${data.totalCost}</span>`;
         radarStatus.innerText = "Radar Active • Telemetry Linked";
-        systemNotice.innerHTML = `<strong>Location:</strong> ${resolvedName}<br><br>${data.locationNotice}`;
+        
+        // ADDED: Sleek "Open in Google Maps" action button inside the location readout notice
+        systemNotice.innerHTML = `
+            <strong>Location:</strong> ${resolvedName}<br><br>
+            ${data.locationNotice}<br><br>
+            <a href="${googleMapsUrl}" target="_blank" style="display: inline-flex; align-items: center; background: #fff; color: #1f2937; border: 1px solid #d1d5db; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-top: 5px;">
+                <span style="color: #ea4335; margin-right: 6px; font-size: 14px;">📍</span> Open in Google Maps
+            </a>
+        `;
 
-        // REAL-TIME WEATHER TELEMETRY CARD CLEAR DESIGN
+        // REAL-TIME WEATHER TELEMETRY CARD DESIGN
         if (data.weather) {
             weatherContainer.style.display = 'block';
             weatherContainer.style.background = '#f8fafc';
@@ -225,14 +235,13 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             `;
         }
 
-        // REAL-TIME SMOOTH GEOGRAPHICAL MAP SWEEP (flyTo Animation Upgrade)
+        // REAL-TIME SMOOTH GEOGRAPHICAL MAP SWEEP (flyTo Animation)
         mapContainer.style.display = 'block';
         if (!globalMapInstance) {
             globalMapInstance = L.map('mapBoxContainer').setView([lat, lon], 12);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(globalMapInstance);
             globalMapMarker = L.marker([lat, lon]).addTo(globalMapInstance);
         } else {
-            // Smoothly pans and glides the map over 1.6 seconds to look fully professional
             globalMapInstance.flyTo([lat, lon], 12, {
                 animate: true,
                 duration: 1.6
@@ -240,7 +249,6 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             globalMapMarker.setLatLng([lat, lon]);
         }
         
-        // Force rendering dimensions update smoothly following the animation frame
         setTimeout(() => {
             if (globalMapInstance) globalMapInstance.invalidateSize();
         }, 450);
