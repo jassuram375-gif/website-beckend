@@ -18,8 +18,8 @@ travelForm.addEventListener('submit', async (e) => {
     };
 
     try {
-        // 4. Send a POST request to your local Express backend server
-        const response = await fetch('http://localhost:3000/api/plan-trip', {
+        // 4. Send a POST request to your LIVE Render backend server
+        const response = await fetch('https://website-beckend.onrender.com/api/plan-trip', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -35,6 +35,6 @@ travelForm.addEventListener('submit', async (e) => {
 
     } catch (error) {
         console.error('Error connecting to backend:', error);
-        alert('Could not connect to the server. Make sure your terminal is running "node index.js"!');
+        alert('Could not connect to the cloud server. Please check your internet connection or check the Render dashboard logs.');
     }
 });
