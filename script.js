@@ -1,5 +1,3 @@
-// --- script.js ---
-
 // 1. Grab the form element using the ID "travelForm" from your new HTML
 const travelForm = document.getElementById('travelForm');
 
@@ -18,8 +16,8 @@ travelForm.addEventListener('submit', async (e) => {
     };
 
     try {
-        // 4. Send a POST request to your LIVE Render backend server
-        const response = await fetch('https://website-beckend.onrender.com/api/plan-trip', {
+        // 4. Send a POST request to your LIVE Render backend server (Updated path below)
+        const response = await fetch('https://website-beckend.onrender.com/api/calculate-trip', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -31,7 +29,11 @@ travelForm.addEventListener('submit', async (e) => {
         const result = await response.json();
 
         // 6. Pop up an alert with the processed details
-        alert(`Trip Plan Successful!\nDestination: ${result.destination}\nTotal Estimated Cost: ₹${result.totalCost}`);
+        if (result.success) {
+            alert(`Trip Plan Successful!\nDestination: ${destinationInput}\nTotal Estimated Cost: ${result.symbol}${result.totalCost}\nWeather: ${result.weather.temp}°C - ${result.weather.condition}`);
+        } else {
+            alert('Server processed request but returned an error status.');
+        }
 
     } catch (error) {
         console.error('Error connecting to backend:', error);
