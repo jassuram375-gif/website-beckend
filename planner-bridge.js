@@ -18,6 +18,7 @@ const resources = {
 };
 
 i18next.init({ lng: 'en', resources }, function(err, t) { applyTranslations(); });
+
 function applyTranslations() {
     document.querySelectorAll('[data-i18n]').forEach(element => {
         element.innerText = i18next.t(element.getAttribute('data-i18n'));
@@ -96,7 +97,8 @@ authActionBtn.addEventListener('click', async () => {
     try {
         if (activeAuthMode === 'reset') {
             const cachedUser = authActionBtn.getAttribute('data-user-cache');
-            const response = await fetch('http://localhost:3000/api/auth/reset', {
+            // FIX 1: Updated to live Render backend URL
+            const response = await fetch('https://website-beckend.onrender.com/api/auth/reset', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: cachedUser, token: username, newPassword: secretValue })
@@ -114,7 +116,8 @@ authActionBtn.addEventListener('click', async () => {
         }
 
         const endpoint = activeAuthMode === 'login' ? '/api/auth/login' : (activeAuthMode === 'register' ? '/api/auth/register' : '/api/auth/forgot');
-        const response = await fetch(`http://localhost:3000${endpoint}`, {
+        // FIX 2: Updated to live Render backend URL
+        const response = await fetch(`https://website-beckend.onrender.com${endpoint}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password: secretValue })
@@ -186,7 +189,8 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         const lon = parseFloat(geoData[0].lon);
         const resolvedName = geoData[0].display_name;
 
-        const response = await fetch('http://localhost:3000/api/calculate-trip', {
+        // FIX 3: Updated to live Render backend URL
+        const response = await fetch('https://website-beckend.onrender.com/api/calculate-trip', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ destination: resolvedName, lat, lon, days: parseInt(days), targetCurrency, customPackages })
