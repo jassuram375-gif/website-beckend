@@ -176,15 +176,29 @@
 
         h2 { 
             color: var(--text-main); 
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 700;
             margin-top: 0;
             margin-bottom: 25px; 
             border-bottom: 3px solid var(--accent-green); 
-            padding-bottom: 10px; 
+            padding-bottom: 12px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .right-card h2 { border-bottom: 3px solid var(--accent-blue); }
+
+        .owner-badge-inline {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            background: #eff6ff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #dbeafe;
+            letter-spacing: 0px;
+        }
 
         .input-group { margin-bottom: 18px; }
         
@@ -358,7 +372,10 @@
         <div class="grid-wrapper clearfix">
             
             <div class="card">
-                <h2 data-i18n="form_title">Configure Parameters</h2>
+                <h2>
+                    <span data-i18n="form_title">Configure Parameters</span>
+                    <span class="owner-badge-inline">By: Krish Ringwal</span>
+                </h2>
                 
                 <div class="input-group">
                     <label data-i18n="label_dest">Enter Global Destination:</label>
@@ -405,7 +422,10 @@
             </div>
 
             <div class="card right-card">
-                <h2 data-i18n="radar_title">Geographical Radar</h2>
+                <h2>
+                    <span data-i18n="radar_title">Geographical Radar</span>
+                    <span class="owner-badge-inline">Owner: Krish Ringwal</span>
+                </h2>
                 
                 <div class="weather-badge" id="weatherTelemetryContainer"></div>
 
@@ -432,6 +452,6 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="planner-bridge.js?v=final_patch_6"></script>
+    <script src="planner-bridge.js?v=final_patch_7"></script>
 </body>
 </html>
