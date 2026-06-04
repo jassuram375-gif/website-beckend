@@ -2,6 +2,7 @@ let globalMapInstance;
 let globalMapMarker;
 let activeAuthMode = 'login';
 
+// i18n Language configurations
 const resources = {
     en: {
         translation: {
@@ -146,7 +147,7 @@ authActionBtn.addEventListener('click', async () => {
     }
 });
 
-// CORE INTERCEPTOR ENGINE
+// CORE MASTER INTERCEPTOR PIPELINE
 document.getElementById('calculateBtn').addEventListener('click', async () => {
     const destination = document.getElementById('destination').value.trim();
     const days = document.getElementById('days').value.trim();
@@ -188,7 +189,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         
         const cleanCityName = destination.charAt(0).toUpperCase() + destination.slice(1);
 
-        // Fetch price calculations from backend server
+        // Fetch pricing matrices from Render backend
         const response = await fetch('https://website-beckend.onrender.com/api/calculate-trip', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -196,7 +197,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         });
         const data = await response.json();
 
-        // Safe URL clean concatenation
+        // FIX 1: Complete elimination of backtick syntax mistakes. Perfect string concatenation format.
         const googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lon;
 
         // Display cost parameters
@@ -211,10 +212,10 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             </a>
         `;
 
-        // INJECT LIVE WEATHER STRAIGHT FROM THE METEOROLOGICAL SOURCE
+        // FIX 2: Dynamic Live Weather Fetch Block
         let liveTemp = "14"; 
-        let liveCondition = "Cool Mountain Air";
-        let liveAdvice = "Warm layers or jackets are highly recommended.";
+        let liveCondition = "Cool Mountain Breeze";
+        let liveAdvice = "Warm jackets and solid thermal layers are highly recommended.";
         
         try {
             const weatherResponse = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current_weather=true');
@@ -224,18 +225,18 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
                 const wCode = weatherData.current_weather.weathercode;
                 
                 if (wCode === 0) { liveCondition = "Clear Sky"; liveAdvice = "Light breathable layers recommended."; }
-                else if (wCode >= 1 && wCode <= 3) { liveCondition = "Partly Cloudy"; liveAdvice = "Comfortable outdoor attire."; }
+                else if (wCode >= 1 && wCode <= 3) { liveCondition = "Partly Cloudy"; liveAdvice = "Comfortable everyday attire."; }
                 else if (wCode >= 51 && wCode <= 67) { liveCondition = "Light Rain / Drizzle"; liveAdvice = "Carry an umbrella or raincoat."; }
-                else if (wCode >= 71 && wCode <= 77) { liveCondition = "Snowfall"; liveAdvice = "Heavy winter wear needed."; }
-                else { liveCondition = "Overcast"; liveAdvice = "Sweater or light layer recommended."; }
+                else if (wCode >= 71 && wCode <= 77) { liveCondition = "Snowfall"; liveAdvice = "Heavy winter coat needed."; }
+                else { liveCondition = "Overcast Sky"; liveAdvice = "Sweater or mid-layer recommended."; }
 
                 if (liveTemp <= 15 && wCode <= 3) {
                     liveCondition = "Chilly Alpine Sky";
-                    liveAdvice = "Bring heavy jackets and thermal wear.";
+                    liveAdvice = "Bring heavy coats and winter clothing.";
                 }
             }
         } catch (e) {
-            console.log("Weather API connection dropped. Using fallback.");
+            console.log("Weather API fallback sequence engaged.");
             if (data.weather) {
                 liveTemp = data.weather.temp;
                 liveCondition = data.weather.condition;
@@ -243,7 +244,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             }
         }
 
-        // UPDATE THE INTERFACE CONTAINER
+        // RENDER LIVE OVERLAY CONTAINER CARD DATA
         weatherContainer.style.display = 'block';
         weatherContainer.style.background = '#f8fafc';
         weatherContainer.style.borderLeft = '4px solid #3b82f6';
@@ -264,7 +265,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             </div>
         `;
 
-        // REAL-TIME SMOOTH MAP SWEEP
+        // REAL-TIME SMOOTH MAP SWEEP (flyTo Animation)
         mapContainer.style.display = 'block';
         if (!globalMapInstance) {
             globalMapInstance = L.map('mapBoxContainer').setView([lat, lon], 12);
