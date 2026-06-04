@@ -147,7 +147,7 @@ authActionBtn.addEventListener('click', async () => {
     }
 });
 
-// CORE MASTER INTERCEPTOR PIPELINE
+// CORE MASTER PIPELINE INTERCEPTOR WITH TRUE WEATHER OVERRIDES
 document.getElementById('calculateBtn').addEventListener('click', async () => {
     const destination = document.getElementById('destination').value.trim();
     const days = document.getElementById('days').value.trim();
@@ -189,7 +189,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         
         const cleanCityName = destination.charAt(0).toUpperCase() + destination.slice(1);
 
-        // Fetch pricing matrices from Render backend
+        // 1. Fetch pricing calculations from Render backend
         const response = await fetch('https://website-beckend.onrender.com/api/calculate-trip', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -197,10 +197,11 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         });
         const data = await response.json();
 
-        // FIX 1: Complete elimination of backtick syntax mistakes. Perfect string concatenation format.
+        // Standard string construction for Google Maps intents link
         const googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lon;
 
         // Display cost parameters
+        costResult.style.display = 'block';
         costResult.innerHTML = '<strong>Customized Total:</strong> <span style="color:#10b981; font-size:18px; font-weight:700;">' + data.symbol + data.totalCost + '</span>';
         radarStatus.innerText = "Radar Active • Telemetry Linked";
         
@@ -212,7 +213,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             </a>
         `;
 
-        // FIX 2: Dynamic Live Weather Fetch Block
+        // 2. ABSOLUTE LIVE WEATHER OVERRIDE BLOCK (Runs AFTER backend finishes to overwrite old 28°C cache data)
         let liveTemp = "14"; 
         let liveCondition = "Cool Mountain Breeze";
         let liveAdvice = "Warm jackets and solid thermal layers are highly recommended.";
@@ -227,12 +228,12 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
                 if (wCode === 0) { liveCondition = "Clear Sky"; liveAdvice = "Light breathable layers recommended."; }
                 else if (wCode >= 1 && wCode <= 3) { liveCondition = "Partly Cloudy"; liveAdvice = "Comfortable everyday attire."; }
                 else if (wCode >= 51 && wCode <= 67) { liveCondition = "Light Rain / Drizzle"; liveAdvice = "Carry an umbrella or raincoat."; }
-                else if (wCode >= 71 && wCode <= 77) { liveCondition = "Snowfall"; liveAdvice = "Heavy winter coat needed."; }
-                else { liveCondition = "Overcast Sky"; liveAdvice = "Sweater or mid-layer recommended."; }
+                else if (wCode >= 71 && wCode <= 77) { liveCondition = "Snowfall"; liveAdvice = "Heavy winter outerwear needed."; }
+                else { liveCondition = "Overcast Skies"; liveAdvice = "Sweater or fleece layers recommended."; }
 
                 if (liveTemp <= 15 && wCode <= 3) {
-                    liveCondition = "Chilly Alpine Sky";
-                    liveAdvice = "Bring heavy coats and winter clothing.";
+                    liveCondition = "Chilly Alpine Weather";
+                    liveAdvice = "Bring winter jackets and warm thermal clothing.";
                 }
             }
         } catch (e) {
@@ -244,13 +245,16 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             }
         }
 
-        // RENDER LIVE OVERLAY CONTAINER CARD DATA
+        // FORCE RENDER REAL-TIME TELEMETRY DATA VIA UI
         weatherContainer.style.display = 'block';
         weatherContainer.style.background = '#f8fafc';
         weatherContainer.style.borderLeft = '4px solid #3b82f6';
         weatherContainer.style.padding = '14px';
         weatherContainer.style.borderRadius = '0 8px 8px 0';
         weatherContainer.style.marginTop = '15px';
+        weatherContainer.style.borderTop = '1px solid #e2e8f0';
+        weatherContainer.style.borderRight = '1px solid #e2e8f0';
+        weatherContainer.style.borderBottom = '1px solid #e2e8f0';
         
         weatherContainer.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
