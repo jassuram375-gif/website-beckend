@@ -196,7 +196,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         });
         const data = await response.json();
 
-        // FIXED: Replaced corrupted syntax with true template literals for real-time accuracy
+        // FIXED: Universal template string configuration using true variables for accurate maps search matching
         const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 
         // Display cost parameters
