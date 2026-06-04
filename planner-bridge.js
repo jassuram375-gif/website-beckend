@@ -189,33 +189,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         
         const cleanCityName = destination.charAt(0).toUpperCase() + destination.slice(1);
 
-        // FIX 1: Fetch TRUE live weather data straight from Open-Meteo's meteorological database using coordinates!
-        let realTemp = 24;
-        let realCondition = "Clear Sky";
-        let realAdvice = "Light clothes are recommended.";
-        
-        try {
-            const weatherResponse = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current_weather=true');
-            const weatherData = await weatherResponse.json();
-            if (weatherData && weatherData.current_weather) {
-                realTemp = Math.round(weatherData.current_weather.temperature);
-                
-                // Map climate parameters automatically
-                if (realTemp <= 15) {
-                    realCondition = "Cool / Alpine Breeze";
-                    realAdvice = "Heavy jacket or thermal layering required.";
-                } else if (realTemp > 15 && realTemp <= 22) {
-                    realCondition = "Pleasant / Cloudy Overcast";
-                    realAdvice = "Light jacket or sweater recommended.";
-                } else {
-                    realCondition = "Warm Clear Skies";
-                    realAdvice = "Light breathable cotton layers recommended.";
-                }
-            }
-        } catch (e) {
-            console.log("Weather API fallback applied.");
-        }
-
+        // Fetch calculations from Render backend server
         const response = await fetch('https://website-beckend.onrender.com/api/calculate-trip', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -223,11 +197,11 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         });
         const data = await response.json();
 
-        // FIX 2: Fixed the broken URL construction completely. No more "0{lat}" bugs!
-        const googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lon;
+        // FIX 1: Corrected string formatting to eliminate the "0{lat}" bugs completely!
+        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 
         // Display cost parameters
-        costResult.innerHTML = '<strong>Customized Total:</strong> <span style="color:#10b981; font-size:18px; font-weight:700;">' + data.symbol + data.totalCost + '</span>';
+        costResult.innerHTML = `<strong>Customized Total:</strong> <span style="color:#10b981; font-size:18px; font-weight:700;">${data.symbol}${data.totalCost}</span>`;
         radarStatus.innerText = "Radar Active • Telemetry Linked";
         
         systemNotice.innerHTML = `
@@ -238,7 +212,41 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             </a>
         `;
 
-        // DISPLAY TRUE LIVE WEATHER TELEMETRY CARD
+        // FIX 2: FORCE LIVE WEATHER WEATHER EXTRACTION (Overwrites fake 28°C / 24°C backend fallbacks)
+        let liveTemp = "14";
+        let liveCondition = "Cool / Alpine Breeze";
+        let liveAdvice = "Heavy jacket or thermal layering required.";
+        
+        try {
+            const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+            const weatherData = await weatherResponse.json();
+            if (weatherData && weatherData.current_weather) {
+                liveTemp = Math.round(weatherData.current_weather.temperature);
+                const wCode = weatherData.current_weather.weathercode;
+                
+                // Dynamic weather description generator based on global meteorological codes
+                if (wCode === 0) { liveCondition = "Clear Sky"; liveAdvice = "Light breathable cotton layers recommended."; }
+                else if (wCode >= 1 && wCode <= 3) { liveCondition = "Partly Cloudy"; liveAdvice = "Comfortable everyday attire."; }
+                else if (wCode >= 51 && wCode <= 67) { liveCondition = "Light Rain / Drizzle"; liveAdvice = "Carry an umbrella or raincoat."; }
+                else if (wCode >= 71 && wCode <= 77) { liveCondition = "Snowfall"; liveAdvice = "Heavy winter coat and thermals needed."; }
+                else { liveCondition = "Overcast"; liveAdvice = "Light jacket or sweater recommended."; }
+
+                // Double check temperature for extreme alpine thresholds
+                if (liveTemp <= 15 && wCode <= 3) {
+                    liveCondition = "Chilly / Clear Alpine Sky";
+                    liveAdvice = "Warm layers or jackets are highly recommended.";
+                }
+            }
+        } catch (e) {
+            console.log("Weather fetch error, using calculation values.");
+            if (data.weather) {
+                liveTemp = data.weather.temp;
+                liveCondition = data.weather.condition;
+                liveAdvice = data.weather.advice;
+            }
+        }
+
+        // RENDER ACTUAL DYNAMIC LIVE TELEMETRY INTERFACE CARD
         weatherContainer.style.display = 'block';
         weatherContainer.style.background = '#f8fafc';
         weatherContainer.style.borderLeft = '4px solid #3b82f6';
@@ -250,16 +258,16 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <strong style="color: #1e293b; font-size: 14px;">🌤️ Live Climate: ${cleanCityName}</strong>
                 <span style="background: #dbeafe; color: #1e40af; font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                    ${realTemp}°C
+                    ${liveTemp}°C
                 </span>
             </div>
             <div style="color: #475569; font-size: 13px; line-height: 1.5;">
-                <span style="display: block; margin-bottom: 4px;"><strong>Conditions:</strong> ${realCondition}</span>
-                <span style="color: #2563eb; font-weight: 500;">📌 <strong>Packing Advice:</strong> ${realAdvice}</span>
+                <span style="display: block; margin-bottom: 4px;"><strong>Conditions:</strong> ${liveCondition}</span>
+                <span style="color: #2563eb; font-weight: 500;">📌 <strong>Packing Advice:</strong> ${liveAdvice}</span>
             </div>
         `;
 
-        // REAL-TIME SMOOTH GEOGRAPHICAL MAP SWEEP (flyTo Animation)
+        // REAL-TIME SMOOTH GEOGRAPHICAL MAP SWEEP (flyTo Animation Upgrade)
         mapContainer.style.display = 'block';
         if (!globalMapInstance) {
             globalMapInstance = L.map('mapBoxContainer').setView([lat, lon], 12);
