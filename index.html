@@ -40,7 +40,7 @@
 
         .header-bar {
             background: var(--card-bg);
-            padding: 20px 30px;
+            padding: 25px 30px;
             border-radius: 16px;
             box-shadow: var(--shadow);
             margin-bottom: 25px;
@@ -276,7 +276,6 @@
             border-radius: 8px;
         }
 
-        /* Live weather readout layout box */
         .weather-badge {
             border-radius: 8px;
             margin-bottom: 15px;
@@ -323,6 +322,10 @@
                     </div>
                     <button class="auth-toggle-btn" id="accountMenuBtn">Sign In / Register</button>
                 </div>
+            </div>
+            
+            <div style="clear: both; margin-top: 15px; padding-top: 10px; border-top: 1px dashed var(--border-color); font-size: 12px; color: var(--text-muted); font-weight: 500;">
+                🛡️ Platform System Owner: <span style="color: var(--accent-blue); font-weight: 700; background: #eff6ff; padding: 3px 8px; border-radius: 6px; border: 1px solid #dbeafe;">Krish Ringwal</span>
             </div>
         </div>
 
@@ -415,9 +418,20 @@
             </div>
 
         </div>
+
+        <footer style="text-align: center; margin-top: 50px; padding: 25px 0; border-top: 1px solid var(--border-color); clear: both;">
+            <p style="margin: 0; font-size: 13px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.3px;">
+                Website Owner & Developer: 
+                <span style="color: var(--accent-blue); font-weight: 700;">Krish Ringwal</span>
+            </p>
+            <p style="margin: 5px 0 0 0; font-size: 11px; color: #94a3b8;">
+                © 2026 Global Next-Gen Travel Suite Pro • All Rights Reserved
+            </p>
+        </footer>
+
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="planner-bridge.js?v=final_patch_4"></script>
+    <script src="planner-bridge.js?v=final_patch_6"></script>
 </body>
 </html>
