@@ -196,7 +196,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         });
         const data = await response.json();
 
-        // FIX: Replaced the corrupted query link with a native, universally verified Google Maps search coordinate string
+        // FIXED: Universal dynamic string construction for real Google Maps redirects
         const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 
         // Display cost parameters
