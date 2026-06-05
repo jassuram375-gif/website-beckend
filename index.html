@@ -26,7 +26,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: radial-gradient(circle at top left, #f1f5f9 0%, #cbd5e1 100%);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             min-height: 100vh;
             box-sizing: border-box;
         }
@@ -36,34 +36,38 @@
             margin: 0 auto;
         }
 
-        /* NEW: Sticky Top Navigation Menu Bar */
+        /* Responsive Navigation Menu */
         .navbar-suite {
             background: var(--card-bg);
-            padding: 15px 30px;
+            padding: 15px;
             border-radius: 14px;
             box-shadow: var(--shadow);
             margin-bottom: 25px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 15px;
             align-items: center;
             border: 1px solid rgba(255,255,255,0.7);
         }
 
         .nav-links {
             display: flex;
-            gap: 15px;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .nav-tab-btn {
-            padding: 10px 18px;
+            padding: 10px 14px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
             cursor: pointer;
             transition: all 0.2s ease;
             border: none;
             background: transparent;
+            white-space: nowrap;
         }
 
         .nav-tab-btn.active {
@@ -78,16 +82,17 @@
 
         .header-bar {
             background: var(--card-bg);
-            padding: 25px 30px;
+            padding: 20px;
             border-radius: 16px;
             box-shadow: var(--shadow);
             margin-bottom: 25px;
             border: 1px solid rgba(255,255,255,0.7);
+            text-align: center;
         }
 
         .header-title {
             margin: 0;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--text-main);
         }
@@ -101,9 +106,10 @@
             font-weight: 600;
             cursor: pointer;
             border: none;
+            width: 100%;
+            max-width: 200px;
         }
 
-        /* MODULAR ROUTING VIEWS CONTROL */
         .app-view-panel {
             display: none;
         }
@@ -114,7 +120,7 @@
 
         .auth-card {
             background: var(--card-bg);
-            padding: 30px;
+            padding: 20px;
             border-radius: 16px;
             box-shadow: var(--shadow);
             margin-bottom: 25px;
@@ -130,8 +136,8 @@
 
         .auth-tab {
             font-weight: 700;
-            font-size: 14px;
-            margin-right: 20px;
+            font-size: 13px;
+            margin-right: 15px;
             cursor: pointer;
             color: var(--text-muted);
         }
@@ -143,47 +149,45 @@
         }
 
         .auth-inline-group {
-            display: inline-block;
-            margin-right: 15px;
-            width: 260px;
-            vertical-align: top;
+            display: block;
+            margin-bottom: 15px;
+            width: 100%;
         }
 
+        /* MOBILE FIRST LAYOUT: Cards take 100% full width by default so they aren't congested */
         .card {
             background: var(--card-bg);
-            padding: 35px;
+            padding: 25px;
             border-radius: 16px;
             box-shadow: var(--shadow);
-            width: 48%;
-            float: left;
-            margin-right: 4%;
+            width: 100%;
             box-sizing: border-box;
             border: 1px solid rgba(255,255,255,0.7);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .card.right-card {
-            margin-right: 0;
-            width: 48%;
+            width: 100%;
         }
 
         h2 { 
             color: var(--text-main); 
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             margin-top: 0;
-            margin-bottom: 25px; 
+            margin-bottom: 20px; 
             border-bottom: 3px solid var(--accent-green); 
             padding-bottom: 12px; 
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
         }
 
         .right-card h2 { border-bottom: 3px solid var(--accent-blue); }
 
         .owner-badge-inline {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: var(--accent-blue);
             background: #eff6ff;
@@ -198,10 +202,10 @@
         input:focus, select:focus { outline: none; border-color: var(--accent-green); background-color: #fff; }
 
         .checkbox-container { background: #f8fafc; border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        .checkbox-item { display: block; margin-bottom: 10px; cursor: pointer; font-size: 14px; font-weight: 500; }
-        .checkbox-item input { width: auto; display: inline-block; margin-right: 10px; transform: scale(1.1); }
+        .checkbox-item { display: block; margin-bottom: 10px; cursor: pointer; font-size: 13px; font-weight: 500; }
+        .checkbox-item input { width: auto; margin-right: 10px; transform: scale(1.1); }
 
-        button.main-btn { width: 100%; padding: 14px; background-color: var(--accent-green); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        button.main-btn { width: 100%; padding: 14px; background-color: var(--accent-green); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
         button.main-btn:hover { background-color: #059669; transform: translateY(-1px); }
 
         .result-box { margin-top: 25px; padding: 16px; background: #ecfdf5; border-left: 5px solid var(--accent-green); border-radius: 8px; display: none; font-size: 14px; }
@@ -209,20 +213,26 @@
         .weather-badge { border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: var(--text-main); display: none; }
         #mapBoxContainer { width: 100%; height: 250px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--border-color); display: none; z-index: 1; }
 
-        /* NEW: Packing Checklist Style Components */
-        .pack-list-item {
-            display: flex;
-            align-items: center;
-            background: #fff;
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
+        .pack-list-item { display: flex; align-items: center; background: #fff; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; font-size: 13px; }
         .pack-list-item input { width: auto; margin-right: 12px; transform: scale(1.2); }
 
         .clearfix::after { content: ""; clear: both; display: table; }
+
+        /* 💻 DESKTOP MEDIA QUERY: Automatically snaps items back side-by-side on large laptop screens */
+        @media (min-width: 768px) {
+            body { padding: 30px; }
+            .navbar-suite { flex-direction: row; padding: 15px 30px; }
+            .nav-tab-btn { font-size: 13px; }
+            .auth-toggle-btn { width: auto; }
+            .header-bar { text-align: left; padding: 25px 30px; }
+            .header-title { font-size: 22px; }
+            .auth-card { padding: 30px; }
+            .auth-inline-group { display: inline-block; margin-right: 15px; width: 260px; margin-bottom: 0; }
+            .card { width: 48%; float: left; margin-right: 4%; margin-bottom: 30px; padding: 35px; }
+            .card.right-card { margin-right: 0; width: 48%; }
+            h2 { font-size: 18px; flex-direction: row; justify-content: space-between; align-items: center; }
+            .owner-badge-inline { font-size: 11px; }
+        }
     </style>
     <script src="https://unpkg.com/i18next@21.6.11/i18next.min.js"></script>
 </head>
@@ -262,8 +272,8 @@
                     <input type="password" id="authPassword" placeholder="••••••••">
                     <span style="display:block; margin-top:6px; font-size:12px; color:var(--accent-blue); cursor:pointer;" id="forgotPasswordLink">Forgot Password?</span>
                 </div>
-                <div class="auth-inline-group" style="padding-top: 25px;">
-                    <button class="auth-toggle-btn" id="authActionBtn" style="background: var(--accent-blue);">Execute Login</button>
+                <div class="auth-inline-group" style="padding-top: 20px;">
+                    <button class="auth-toggle-btn" id="authActionBtn" style="background: var(--accent-blue); max-width: 100%;">Execute Login</button>
                 </div>
             </div>
             <div id="authStatusAlert" style="margin-top:15px; font-size:13px; font-weight:600; display:none;"></div>
@@ -322,16 +332,16 @@
         </div>
 
         <div id="packingView" class="app-view-panel clearfix">
-            <div class="card" style="width: 100%; margin-right: 0;">
+            <div class="card">
                 <h2>
                     <span>🧳 Real-Time Weather Packing Assistant</span>
                     <span class="owner-badge-inline">Krish Ringwal Engine</span>
                 </h2>
-                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
                     This smart engine automatically syncs with our global weather radar channels to generate custom checklist layouts. Run a target route computation on the Core Engine page first to sync this tool!
                 </p>
                 <div id="packingListTargetContainer">
-                    <div style="text-align: center; padding: 30px; color: var(--text-muted); border: 2px dashed var(--border-color); border-radius: 12px;">
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted); border: 2px dashed var(--border-color); border-radius: 12px; font-size: 13px;">
                         ⚠️ Load coordinates on the Core Engine tab first to trigger the radar climate sync layer.
                     </div>
                 </div>
@@ -339,15 +349,15 @@
         </div>
 
         <div id="databaseView" class="app-view-panel clearfix">
-            <div class="card" style="width: 100%; margin-right: 0;">
+            <div class="card">
                 <h2>
                     <span>💾 Secure Cloud Database Ledger Sync</span>
                     <span class="owner-badge-inline">MongoDB Linked</span>
                 </h2>
-                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
                     Below is the live tracking index pulled directly from our database server clusters. Ensure you are signed into your global profile link to access telemetry data logs.
                 </p>
-                <div id="cloudDataContainer" style="font-size: 14px; background: #f8fafc; border: 1px dashed var(--border-color); padding: 25px; text-align: center; border-radius: 12px; color: var(--text-muted);">
+                <div id="cloudDataContainer" style="font-size: 13px; background: #f8fafc; border: 1px dashed var(--border-color); padding: 25px; text-align: center; border-radius: 12px; color: var(--text-muted);">
                     🔒 Verification Required. Please log into your Profile Account via the upper corner dashboard interface.
                 </div>
             </div>
@@ -366,7 +376,6 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // CLIENT FRONT-END MULTI-VIEW TAB VIEW SWITCH ENGINE
         function switchSuiteView(targetViewId, clickedButton) {
             document.querySelectorAll('.app-view-panel').forEach(view => {
                 view.classList.remove('active-view');
@@ -378,12 +387,11 @@
             document.getElementById(targetViewId).classList.add('active-view');
             clickedButton.classList.add('active');
             
-            // Re-render responsive Leaflet sizing boundaries if switching back to Map view
             if(targetViewId === 'homeView' && typeof globalMapInstance !== 'undefined' && globalMapInstance) {
                 setTimeout(() => { globalMapInstance.invalidateSize(); }, 200);
             }
         }
     </script>
-    <script src="planner-bridge.js?v=final_patch_8"></script>
+    <script src="planner-bridge.js?v=final_patch_9"></script>
 </body>
 </html>
