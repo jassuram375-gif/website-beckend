@@ -26,16 +26,54 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: radial-gradient(circle at top left, #f1f5f9 0%, #cbd5e1 100%);
             margin: 0;
-            padding: 40px 20px;
-            display: block;
+            padding: 20px;
             min-height: 100vh;
             box-sizing: border-box;
         }
 
         .layout-container {
-            display: block;
-            max-width: 1020px;
+            max-width: 1140px;
             margin: 0 auto;
+        }
+
+        /* NEW: Sticky Top Navigation Menu Bar */
+        .navbar-suite {
+            background: var(--card-bg);
+            padding: 15px 30px;
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-tab-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: transparent;
+        }
+
+        .nav-tab-btn.active {
+            background: #eff6ff;
+            color: var(--accent-blue);
+        }
+
+        .nav-tab-btn:hover:not(.active) {
+            background: #f1f5f9;
+            color: var(--text-main);
         }
 
         .header-bar {
@@ -44,38 +82,17 @@
             border-radius: 16px;
             box-shadow: var(--shadow);
             margin-bottom: 25px;
-            display: block;
             border: 1px solid rgba(255,255,255,0.7);
         }
 
-        .header-content {
-            display: block;
-            overflow: hidden;
-        }
-
         .header-title {
-            float: left;
             margin: 0;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: var(--text-main);
-            line-height: 40px;
-        }
-
-        .controls-wrapper {
-            float: right;
-            display: block;
-        }
-
-        .lang-wrapper {
-            display: inline-block;
-            width: 140px;
-            margin-right: 15px;
-            vertical-align: middle;
         }
 
         .auth-toggle-btn {
-            display: inline-block;
             padding: 10px 20px;
             background-color: var(--text-main);
             color: white;
@@ -84,7 +101,15 @@
             font-weight: 600;
             cursor: pointer;
             border: none;
-            vertical-align: middle;
+        }
+
+        /* MODULAR ROUTING VIEWS CONTROL */
+        .app-view-panel {
+            display: none;
+        }
+
+        .app-view-panel.active-view {
+            display: block;
         }
 
         .auth-card {
@@ -124,46 +149,14 @@
             vertical-align: top;
         }
 
-        .auth-inline-group input {
-            padding: 10px 12px;
-        }
-
-        .forgot-link-text {
-            display: block;
-            margin-top: 6px;
-            font-size: 12px;
-            color: var(--accent-blue);
-            cursor: pointer;
-            font-weight: 500;
-            text-decoration: underline;
-        }
-
-        .auth-submit-btn {
-            display: inline-block;
-            width: 150px;
-            padding: 12px;
-            background-color: var(--accent-blue);
-            color: white;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .grid-wrapper {
-            display: block;
-            clear: both;
-        }
-
         .card {
             background: var(--card-bg);
             padding: 35px;
             border-radius: 16px;
             box-shadow: var(--shadow);
-            width: 470px;
+            width: 48%;
             float: left;
-            margin-right: 30px;
+            margin-right: 4%;
             box-sizing: border-box;
             border: 1px solid rgba(255,255,255,0.7);
             margin-bottom: 30px;
@@ -171,12 +164,12 @@
 
         .card.right-card {
             margin-right: 0;
-            width: 520px;
+            width: 48%;
         }
 
         h2 { 
             color: var(--text-main); 
-            font-size: 19px;
+            font-size: 18px;
             font-weight: 700;
             margin-top: 0;
             margin-bottom: 25px; 
@@ -197,252 +190,172 @@
             padding: 4px 8px;
             border-radius: 6px;
             border: 1px solid #dbeafe;
-            letter-spacing: 0px;
         }
 
         .input-group { margin-bottom: 18px; }
-        
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: 600; 
-            font-size: 13px;
-            color: var(--text-main);
-        }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: var(--text-main); }
+        input, select { width: 100%; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 14px; color: var(--text-main); background-color: #f8fafc; }
+        input:focus, select:focus { outline: none; border-color: var(--accent-green); background-color: #fff; }
 
-        input, select { 
-            width: 100%; 
-            padding: 12px 14px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 10px; 
-            box-sizing: border-box; 
-            font-family: inherit;
-            font-size: 14px;
-            color: var(--text-main);
-            background-color: #f8fafc;
-        }
+        .checkbox-container { background: #f8fafc; border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .checkbox-item { display: block; margin-bottom: 10px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .checkbox-item input { width: auto; display: inline-block; margin-right: 10px; transform: scale(1.1); }
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-green);
-            background-color: #fff;
-        }
+        button.main-btn { width: 100%; padding: 14px; background-color: var(--accent-green); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        button.main-btn:hover { background-color: #059669; transform: translateY(-1px); }
 
-        .checkbox-container {
-            background: #f8fafc;
+        .result-box { margin-top: 25px; padding: 16px; background: #ecfdf5; border-left: 5px solid var(--accent-green); border-radius: 8px; display: none; font-size: 14px; }
+        .wardrobe-section { margin-bottom: 15px; border-left: 5px solid var(--accent-blue); background: #eff6ff; padding: 15px; border-radius: 8px; }
+        .weather-badge { border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: var(--text-main); display: none; }
+        #mapBoxContainer { width: 100%; height: 250px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--border-color); display: none; z-index: 1; }
+
+        /* NEW: Packing Checklist Style Components */
+        .pack-list-item {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            padding: 12px 15px;
             border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .checkbox-item {
-            display: block;
+            border-radius: 8px;
             margin-bottom: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .checkbox-item:last-child { margin-bottom: 0; }
-
-        .checkbox-item input {
-            width: auto;
-            display: inline-block;
-            margin-right: 10px;
-            transform: scale(1.1);
-        }
-
-        button.main-btn { 
-            width: 100%; 
-            padding: 14px; 
-            background-color: var(--accent-green); 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            font-size: 15px; 
-            font-weight: 600;
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-        }
-
-        button.main-btn:hover { 
-            background-color: #059669; 
-            transform: translateY(-1px);
-        }
-
-        .result-box { 
-            margin-top: 25px; 
-            padding: 16px; 
-            background: #ecfdf5; 
-            border-left: 5px solid var(--accent-green); 
-            border-radius: 8px; 
-            display: none; 
             font-size: 14px;
         }
+        .pack-list-item input { width: auto; margin-right: 12px; transform: scale(1.2); }
 
-        .wardrobe-section { 
-            margin-bottom: 15px;
-            border-left: 5px solid var(--accent-blue); 
-            background: #eff6ff; 
-            display: block;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .weather-badge {
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            color: var(--text-main);
-            display: none;
-        }
-
-        #mapBoxContainer {
-            width: 100%;
-            height: 250px;
-            border-radius: 12px;
-            margin-top: 15px;
-            border: 1px solid var(--border-color);
-            display: none;
-            z-index: 1;
-        }
-
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
+        .clearfix::after { content: ""; clear: both; display: table; }
     </style>
-
     <script src="https://unpkg.com/i18next@21.6.11/i18next.min.js"></script>
 </head>
 <body>
 
     <div class="layout-container">
         
-        <div class="header-bar clearfix">
-            <div class="header-content">
-                <h1 class="header-title" data-i18n="app_title">Global Next-Gen Travel Suite Pro</h1>
-                <div class="controls-wrapper">
-                    <div class="lang-wrapper">
-                        <select id="languageSelector">
-                            <option value="en" selected>English</option>
-                            <option value="hi">हिन्दी (Hindi)</option>
-                            <option value="es">Español (Spanish)</option>
-                            <option value="fr">Français (French)</option>
-                            <option value="ar">العربية (Arabic)</option>
-                        </select>
-                    </div>
-                    <button class="auth-toggle-btn" id="accountMenuBtn">Sign In / Register</button>
-                </div>
+        <nav class="navbar-suite">
+            <div class="nav-links">
+                <button class="nav-tab-btn active" onclick="switchSuiteView('homeView', this)">🗺️ Core Engine</button>
+                <button class="nav-tab-btn" onclick="switchSuiteView('packingView', this)">🧳 Smart Packing Tool</button>
+                <button class="nav-tab-btn" onclick="switchSuiteView('databaseView', this)">💾 Cloud Saved Trips</button>
             </div>
-            
-            <div style="clear: both; margin-top: 15px; padding-top: 10px; border-top: 1px dashed var(--border-color); font-size: 12px; color: var(--text-muted); font-weight: 500;">
+            <button class="auth-toggle-btn" id="accountMenuBtn">Sign In / Register</button>
+        </nav>
+
+        <div class="header-bar">
+            <h1 class="header-title">Global Next-Gen Travel Suite Pro</h1>
+            <div style="margin-top: 10px; font-size: 12px; color: var(--text-muted); font-weight: 500;">
                 🛡️ Platform System Owner: <span style="color: var(--accent-blue); font-weight: 700; background: #eff6ff; padding: 3px 8px; border-radius: 6px; border: 1px solid #dbeafe;">Krish Ringwal</span>
             </div>
         </div>
 
         <div class="auth-card" id="authBoxPanel">
-            <div class="auth-tabs" id="authTabsContainer">
+            <div class="auth-tabs">
                 <span class="auth-tab active" id="tabLogin">Existing User Login</span>
                 <span class="auth-tab" id="tabRegister">Create Global Profile</span>
                 <span class="auth-tab" id="tabRecover" style="display:none;">Account Recovery</span>
             </div>
-            
             <div class="clearfix" style="overflow: hidden;">
                 <div class="auth-inline-group" id="containerUsername">
                     <label id="lblUsername">Account Username / Email:</label>
                     <input type="text" id="authUsername" placeholder="e.g., krish_kumar">
                 </div>
-                
                 <div class="auth-inline-group" id="containerPassword">
                     <label id="lblPassword">Account Secure Password:</label>
                     <input type="password" id="authPassword" placeholder="••••••••">
-                    <span class="forgot-link-text" id="forgotPasswordLink">Forgot Password?</span>
+                    <span style="display:block; margin-top:6px; font-size:12px; color:var(--accent-blue); cursor:pointer;" id="forgotPasswordLink">Forgot Password?</span>
                 </div>
-                
-                <div class="auth-inline-group" style="width: auto; padding-top: 25px;">
-                    <button class="auth-submit-btn" id="authActionBtn">Execute Login</button>
+                <div class="auth-inline-group" style="padding-top: 25px;">
+                    <button class="auth-toggle-btn" id="authActionBtn" style="background: var(--accent-blue);">Execute Login</button>
                 </div>
             </div>
-            <div id="authStatusAlert" style="margin-top:15px; font-size:13px; font-weight:600; display:none; color: #2563eb;"></div>
+            <div id="authStatusAlert" style="margin-top:15px; font-size:13px; font-weight:600; display:none;"></div>
         </div>
 
-        <div class="grid-wrapper clearfix">
-            
+        <div id="homeView" class="app-view-panel active-view clearfix">
             <div class="card">
                 <h2>
-                    <span data-i18n="form_title">Configure Parameters</span>
+                    <span>Configure Parameters</span>
                     <span class="owner-badge-inline">By: Krish Ringwal</span>
                 </h2>
-                
                 <div class="input-group">
-                    <label data-i18n="label_dest">Enter Global Destination:</label>
+                    <label>Enter Global Destination:</label>
                     <input type="text" id="destination" value="Moradabad">
                 </div>
-                
                 <div class="input-group">
-                    <label data-i18n="label_days">Number of Days:</label>
+                    <label>Number of Days:</label>
                     <input type="number" id="days" value="5">
                 </div>
-
                 <div class="input-group">
-                    <label data-i18n="label_customize">Customize Your Package Add-ons:</label>
+                    <label>Customize Your Package Add-ons:</label>
                     <div class="checkbox-container">
-                        <label class="checkbox-item">
-                            <input type="checkbox" id="addFlight" value="flight" checked> <span data-i18n="pack_flights">Roundtrip Flights Included</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" id="addHotel" value="hotel" checked> <span data-i18n="pack_hotel">5-Star Luxury Stay Upgrade</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" id="addGuide" value="guide"> <span data-i18n="pack_guide">Private Local Culinary Guide</span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" id="addInsurance" value="insurance"> <span data-i18n="pack_insurance">Worldwide Medical Insurance</span>
-                        </label>
+                        <label class="checkbox-item"><input type="checkbox" id="addFlight" checked> Roundtrip Flights Included</label>
+                        <label class="checkbox-item"><input type="checkbox" id="addHotel" checked> 5-Star Luxury Stay Upgrade</label>
+                        <label class="checkbox-item"><input type="checkbox" id="addGuide"> Private Local Culinary Guide</label>
+                        <label class="checkbox-item"><input type="checkbox" id="addInsurance"> Worldwide Medical Insurance</label>
                     </div>
                 </div>
-
                 <div class="input-group">
-                    <label data-i18n="label_currency">Target Display Currency:</label>
+                    <label>Target Display Currency:</label>
                     <select id="currency">
                         <option value="INR" selected>INR (₹)</option>
                         <option value="USD">USD ($)</option>
                         <option value="EUR">EUR (€)</option>
                         <option value="GBP">GBP (£)</option>
-                        <option value="AED">AED (د.إ)</option>
                     </select>
                 </div>
-
-                <button class="main-btn" id="calculateBtn" data-i18n="btn_calculate">Process Global Matrix</button>
+                <button class="main-btn" id="calculateBtn">Process Global Matrix</button>
                 
                 <div id="costResult" class="result-box"></div>
+                <button id="saveTripBtn" class="main-btn" style="background: var(--accent-blue); margin-top: 15px; display: none;">💾 Save Matrix to Cloud Profile</button>
             </div>
 
             <div class="card right-card">
                 <h2>
-                    <span data-i18n="radar_title">Geographical Radar</span>
+                    <span>Geographical Radar</span>
                     <span class="owner-badge-inline">Owner: Krish Ringwal</span>
                 </h2>
-                
                 <div class="weather-badge" id="weatherTelemetryContainer"></div>
-
                 <div id="mapBoxContainer"></div>
-
                 <div id="dynamicWardrobe" class="result-box wardrobe-section" style="display:block; margin-top:25px;">
-                    <strong id="radarStatus" data-i18n="radar_await">Awaiting System Input Coordinates...</strong>
-                    <p id="systemNotice" style="font-size: 13px; color: var(--text-muted);" data-i18n="radar_desc">Select your target language, enter any worldwide destination, choose your package criteria, and run the engine calculation matrix.</p>
+                    <strong id="radarStatus">Awaiting System Input Coordinates...</strong>
+                    <p id="systemNotice" style="font-size: 13px; color: var(--text-muted);">Enter any worldwide destination and run the engine calculation matrix.</p>
                 </div>
             </div>
+        </div>
 
+        <div id="packingView" class="app-view-panel clearfix">
+            <div class="card" style="width: 100%; margin-right: 0;">
+                <h2>
+                    <span>🧳 Real-Time Weather Packing Assistant</span>
+                    <span class="owner-badge-inline">Krish Ringwal Engine</span>
+                </h2>
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+                    This smart engine automatically syncs with our global weather radar channels to generate custom checklist layouts. Run a target route computation on the Core Engine page first to sync this tool!
+                </p>
+                <div id="packingListTargetContainer">
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted); border: 2px dashed var(--border-color); border-radius: 12px;">
+                        ⚠️ Load coordinates on the Core Engine tab first to trigger the radar climate sync layer.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="databaseView" class="app-view-panel clearfix">
+            <div class="card" style="width: 100%; margin-right: 0;">
+                <h2>
+                    <span>💾 Secure Cloud Database Ledger Sync</span>
+                    <span class="owner-badge-inline">MongoDB Linked</span>
+                </h2>
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+                    Below is the live tracking index pulled directly from our database server clusters. Ensure you are signed into your global profile link to access telemetry data logs.
+                </p>
+                <div id="cloudDataContainer" style="font-size: 14px; background: #f8fafc; border: 1px dashed var(--border-color); padding: 25px; text-align: center; border-radius: 12px; color: var(--text-muted);">
+                    🔒 Verification Required. Please log into your Profile Account via the upper corner dashboard interface.
+                </div>
+            </div>
         </div>
 
         <footer style="text-align: center; margin-top: 50px; padding: 25px 0; border-top: 1px solid var(--border-color); clear: both;">
-            <p style="margin: 0; font-size: 13px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.3px;">
-                Website Owner & Developer: 
-                <span style="color: var(--accent-blue); font-weight: 700;">Krish Ringwal</span>
+            <p style="margin: 0; font-size: 13px; color: var(--text-muted); font-weight: 500;">
+                Website Owner & Developer: <span style="color: var(--accent-blue); font-weight: 700;">Krish Ringwal</span>
             </p>
             <p style="margin: 5px 0 0 0; font-size: 11px; color: #94a3b8;">
                 © 2026 Global Next-Gen Travel Suite Pro • All Rights Reserved
@@ -452,6 +365,25 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="planner-bridge.js?v=final_patch_7"></script>
+    <script>
+        // CLIENT FRONT-END MULTI-VIEW TAB VIEW SWITCH ENGINE
+        function switchSuiteView(targetViewId, clickedButton) {
+            document.querySelectorAll('.app-view-panel').forEach(view => {
+                view.classList.remove('active-view');
+            });
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(targetViewId).classList.add('active-view');
+            clickedButton.classList.add('active');
+            
+            // Re-render responsive Leaflet sizing boundaries if switching back to Map view
+            if(targetViewId === 'homeView' && typeof globalMapInstance !== 'undefined' && globalMapInstance) {
+                setTimeout(() => { globalMapInstance.invalidateSize(); }, 200);
+            }
+        }
+    </script>
+    <script src="planner-bridge.js?v=final_patch_8"></script>
 </body>
 </html>
