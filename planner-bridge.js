@@ -1,17 +1,15 @@
 let globalMapInstance;
 let globalMapMarker;
 let activeAuthMode = 'login';
+let currentSessionUser = null;
+
+// Track calculated trip parameters globally for database storage sync
+let activeTripDataCache = null;
 
 const resources = {
     en: {
         translation: {
-            app_title: "Global Next-Gen Travel Suite Pro", form_title: "Configure Parameters",
-            label_dest: "Enter Global Destination:", label_days: "Number of Days:",
-            label_customize: "Customize Your Package Add-ons:", label_currency: "Target Display Currency:",
-            btn_calculate: "Process Global Matrix", radar_title: "Geographical Radar",
-            radar_await: "Awaiting System Input Coordinates...", radar_desc: "Select your target language, enter any worldwide destination, choose your package criteria, and run the engine calculation matrix.",
-            pack_flights: "Roundtrip Flights Included", pack_hotel: "5-Star Luxury Stay Upgrade",
-            pack_guide: "Private Local Culinary Guide", pack_insurance: "Worldwide Medical Insurance"
+            app_title: "Global Next-Gen Travel Suite Pro", form_title: "Configure Parameters"
         }
     }
 };
@@ -24,7 +22,7 @@ function applyTranslations() {
     });
 }
 
-// ACCOUNT MENU HANDLERS
+// ACCOUNT DASHBOARD MENU HANDLERS
 const accountMenuBtn = document.getElementById('accountMenuBtn');
 const authBoxPanel = document.getElementById('authBoxPanel');
 const tabLogin = document.getElementById('tabLogin');
@@ -39,6 +37,7 @@ const lblPassword = document.getElementById('lblPassword');
 const authUsernameInput = document.getElementById('authUsername');
 const authPasswordInput = document.getElementById('authPassword');
 const containerPassword = document.getElementById('containerPassword');
+const saveTripBtn = document.getElementById('saveTripBtn');
 
 accountMenuBtn.addEventListener('click', () => {
     authBoxPanel.style.display = authBoxPanel.style.display === 'block' ? 'none' : 'block';
@@ -69,17 +68,6 @@ tabRegister.addEventListener('click', () => {
     authActionBtn.innerText = "Register Profile";
 });
 
-forgotPasswordLink.addEventListener('click', () => {
-    activeAuthMode = 'forgot';
-    tabRecover.style.display = 'inline-block';
-    tabRecover.className = 'auth-tab active';
-    tabLogin.className = 'auth-tab';
-    tabRegister.className = 'auth-tab';
-    containerPassword.style.display = 'none';
-    lblUsername.innerText = "Enter Registered Email:";
-    authActionBtn.innerText = "Send Recovery Code";
-});
-
 authActionBtn.addEventListener('click', async () => {
     const username = authUsernameInput.value.trim();
     const secretValue = authPasswordInput.value.trim();
@@ -94,26 +82,7 @@ authActionBtn.addEventListener('click', async () => {
     authStatusAlert.innerText = "Securing data route link...";
 
     try {
-        if (activeAuthMode === 'reset') {
-            const cachedUser = authActionBtn.getAttribute('data-user-cache');
-            const response = await fetch('https://website-beckend.onrender.com/api/auth/reset', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: cachedUser, token: username, newPassword: secretValue })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                authStatusAlert.style.color = '#10b981';
-                authStatusAlert.innerText = "Password modified successfully!";
-                setTimeout(() => { switchToLoginMode(); authStatusAlert.style.display='none'; }, 2000);
-            } else {
-                authStatusAlert.style.color = '#ef4444';
-                authStatusAlert.innerText = `Fault: ${data.error}`;
-            }
-            return;
-        }
-
-        const endpoint = activeAuthMode === 'login' ? '/api/auth/login' : (activeAuthMode === 'register' ? '/api/auth/register' : '/api/auth/forgot');
+        const endpoint = activeAuthMode === 'login' ? '/api/auth/login' : '/api/auth/register';
         const response = await fetch(`https://website-beckend.onrender.com${endpoint}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -124,19 +93,17 @@ authActionBtn.addEventListener('click', async () => {
         if (response.ok) {
             authStatusAlert.style.color = '#10b981';
             authStatusAlert.innerText = data.message;
-            if (activeAuthMode === 'login' || activeAuthMode === 'register') {
-                accountMenuBtn.innerText = `User: ${username}`;
-                setTimeout(() => { authBoxPanel.style.display = 'none'; }, 2000);
-            } else if (activeAuthMode === 'forgot') {
-                authActionBtn.setAttribute('data-user-cache', username);
-                activeAuthMode = 'reset';
-                containerPassword.style.display = 'inline-block';
-                forgotPasswordLink.style.display = 'none';
-                lblUsername.innerText = "Enter Token Code:";
-                lblPassword.innerText = "Enter New Password:";
-                authUsernameInput.value = ""; authPasswordInput.value = "";
-                authActionBtn.innerText = "Submit Overrides";
+            currentSessionUser = username;
+            accountMenuBtn.innerText = `👤 ${username}`;
+            
+            // Sync database profile UI cards immediately upon login
+            refreshDatabaseLedgerView();
+            
+            if (activeTripDataCache) {
+                saveTripBtn.style.display = 'block';
             }
+            
+            setTimeout(() => { authBoxPanel.style.display = 'none'; }, 1500);
         } else {
             authStatusAlert.style.color = '#ef4444';
             authStatusAlert.innerText = `Fault: ${data.error}`;
@@ -146,7 +113,7 @@ authActionBtn.addEventListener('click', async () => {
     }
 });
 
-// CORE MASTER ENGINE INTERCEPTOR
+// CORE COMPUTATION MATRIX PIPELINE
 document.getElementById('calculateBtn').addEventListener('click', async () => {
     const destination = document.getElementById('destination').value.trim();
     const days = document.getElementById('days').value.trim();
@@ -185,10 +152,9 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         const lat = parseFloat(geoData[0].lat);
         const lon = parseFloat(geoData[0].lon);
         const resolvedName = geoData[0].display_name;
-        
         const cleanCityName = destination.charAt(0).toUpperCase() + destination.slice(1);
 
-        // Fetch prices from Render backend server
+        // Fetch price formulas from backend server
         const response = await fetch('https://website-beckend.onrender.com/api/calculate-trip', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -196,10 +162,9 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         });
         const data = await response.json();
 
-        // FIXED: Perfect standard intent parameters to ensure it passes cleanly on mobile browsers
         const googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lon;
 
-        // Display cost parameters
+        // Render cost results metrics
         costResult.innerHTML = '<strong>Customized Total:</strong> <span style="color:#10b981; font-size:18px; font-weight:700;">' + data.symbol + data.totalCost + '</span>';
         radarStatus.innerText = "Radar Active • Telemetry Linked";
         
@@ -207,43 +172,53 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             <strong>Location:</strong> ${resolvedName}<br><br>
             ${data.locationNotice}<br><br>
             <a href="${googleMapsUrl}" target="_blank" style="display: inline-flex; align-items: center; background: #fff; color: #1f2937; border: 1px solid #d1d5db; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-top: 5px;">
-                <span style="color: #ea4335; margin-right: 6px; font-size: 14px;">📍</span> Open in Google Maps
+                📍 Open in Google Maps
             </a>
         `;
 
-        // FIXED DIRECT WEATHER INJECTION LAYER (Wipes out backend response blocks completely)
-        let liveTemp = "14"; 
-        let liveCondition = "Cool Mountain Breeze";
-        let liveAdvice = "Warm jackets and solid thermal layers are highly recommended.";
+        // Cache parameters globally for our impending DB cloud saving pipeline
+        activeTripDataCache = {
+            destination: cleanCityName,
+            fullAddress: resolvedName,
+            days: parseInt(days),
+            costString: data.symbol + data.totalCost
+        };
+
+        if (currentSessionUser) {
+            saveTripBtn.style.display = 'block';
+        }
+
+        // PURE LIVE WEATHER DECOUPLING NETWORK OVERRIDE ENGINE
+        let liveTemp = 24; 
+        let liveCondition = "Clear Conditions";
+        let liveAdvice = "Comfortable light attire recommended.";
         
         try {
-            const weatherResponse = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current_weather=true');
+            const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
             const weatherData = await weatherResponse.json();
             if (weatherData && weatherData.current_weather) {
-                liveTemp = Math.round(weatherData.current_weather.temperature).toString();
+                liveTemp = Math.round(weatherData.current_weather.temperature);
                 const wCode = weatherData.current_weather.weathercode;
                 
-                if (wCode === 0) { liveCondition = "Clear Sky"; liveAdvice = "Light breathable layers recommended."; }
-                else if (wCode >= 1 && wCode <= 3) { liveCondition = "Partly Cloudy"; liveAdvice = "Comfortable everyday attire."; }
-                else if (wCode >= 51 && wCode <= 67) { liveCondition = "Light Rain / Drizzle"; liveAdvice = "Carry an umbrella or raincoat."; }
-                else if (wCode >= 71 && wCode <= 77) { liveCondition = "Snowfall"; liveAdvice = "Heavy winter outerwear needed."; }
-                else { liveCondition = "Overcast Skies"; liveAdvice = "Sweater or fleece layers recommended."; }
+                if (wCode === 0) { liveCondition = "Clear Sky"; liveAdvice = "Light breathable cotton layers recommended."; }
+                else if (wCode >= 1 && wCode <= 3) { liveCondition = "Partly Cloudy"; liveAdvice = "Comfortable everyday outfits."; }
+                else if (wCode >= 51 && wCode <= 67) { liveCondition = "Rainy / Wet Weather"; liveAdvice = "Waterproof outerwear and umbrellas required."; }
+                else if (wCode >= 71 && wCode <= 77) { liveCondition = "Snowfall Matrix"; liveAdvice = "Heavy winter jackets and insulating thermals are mandatory."; }
+                else { liveCondition = "Overcast Skies"; liveAdvice = "Windcheaters or light sweaters recommended."; }
 
-                if (parseInt(liveTemp) <= 15) {
-                    liveCondition = "Chilly Alpine Weather";
-                    liveAdvice = "Bring winter jackets and warm thermal clothing.";
+                if (liveTemp <= 15) {
+                    liveCondition = "Chilly Alpine Climate";
+                    liveAdvice = "Bring heavy jackets, warm woolens, and thermal innerwear.";
                 }
             }
         } catch (e) {
-            console.log("Weather API connection dropped. Using fallback.");
             if (data.weather) {
                 liveTemp = data.weather.temp;
                 liveCondition = data.weather.condition;
-                liveAdvice = data.weather.advice;
             }
         }
 
-        // FORCE UI INJECTION
+        // Update main dashboard weather card readout container
         weatherContainer.style.display = 'block';
         weatherContainer.style.background = '#f8fafc';
         weatherContainer.style.borderLeft = '4px solid #3b82f6';
@@ -257,7 +232,7 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
         weatherContainer.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <strong style="color: #1e293b; font-size: 14px;">🌤️ Live Climate: ${cleanCityName}</strong>
-                <span style="background: #dbeafe; color: #1e40af; font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                <span style="background: #dbeafe; color: #1e40af; font-weight: bold; padding: 4px 10px; border-radius: 20px; font-size: 14px;">
                     ${liveTemp}°C
                 </span>
             </div>
@@ -267,25 +242,162 @@ document.getElementById('calculateBtn').addEventListener('click', async () => {
             </div>
         `;
 
-        // REAL-TIME SMOOTH MAP SWEEP
+        // INJECT MODULE: Generate Smart Interactive Checklist Layouts dynamically inside Tab 2
+        generateSmartPackingChecklist(cleanCityName, liveTemp, liveCondition);
+
+        // MAP CONTROLLERS
         mapContainer.style.display = 'block';
         if (!globalMapInstance) {
             globalMapInstance = L.map('mapBoxContainer').setView([lat, lon], 12);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(globalMapInstance);
             globalMapMarker = L.marker([lat, lon]).addTo(globalMapInstance);
         } else {
-            globalMapInstance.flyTo([lat, lon], 12, {
-                animate: true,
-                duration: 1.6
-            });
+            globalMapInstance.flyTo([lat, lon], 12, { animate: true, duration: 1.6 });
             globalMapMarker.setLatLng([lat, lon]);
         }
         
-        setTimeout(() => {
-            if (globalMapInstance) globalMapInstance.invalidateSize();
-        }, 450);
+        setTimeout(() => { if (globalMapInstance) globalMapInstance.invalidateSize(); }, 450);
 
     } catch (err) {
-        costResult.innerHTML = "<span style='color:red;'>Link offline. Check backend logs!</span>";
+        costResult.innerHTML = "<span style='color:red;'>Link transaction offline.</span>";
     }
 });
+
+// FEATURE 1: SMART PACKING ENGINE DATA CHECKLIST POPULATOR (TAB 2)
+function generateSmartPackingChecklist(city, temperature, condition) {
+    const targetBox = document.getElementById('packingListTargetContainer');
+    
+    // Core essential items list
+    let listItems = [
+        "Government ID Card & Travel Tickets Documents",
+        "Mobile Charger & Power Bank unit",
+        "Basic Personal Hygiene kit & Toothbrush"
+    ];
+
+    // Dynamic weather addition variables
+    if (temperature <= 15) {
+        listItems.push("❄️ Heavy Woolen Jacket or Parka");
+        listItems.push("❄️ Thermal Innerwear Layers");
+        listItems.push("❄️ Warm Gloves & Woolen Socks");
+    } else if (condition.includes("Rain") || condition.includes("Wet")) {
+        listItems.push("☔ Compact Traveling Umbrella");
+        listItems.push("☔ Waterproof Raincoat / Windcheater");
+        listItems.push("☔ Quick-dry Towel & Waterproof phone pouch");
+    } else {
+        listItems.push("☀️ Light Breathable Cotton Clothes");
+        listItems.push("☀️ Protective Sunglasses & Sunscreen Lotion");
+        listItems.push("☀️ Comfortable Walking/Running Shoes");
+    }
+
+    // Render interactive checked item forms structures
+    targetBox.innerHTML = `
+        <div style="margin-bottom: 15px; padding: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; font-size: 13px; color: #166534; font-weight: 600;">
+            ✅ Live Weather Sync Active: Customized list generated for ${city} (${temperature}°C - ${condition})
+        </div>
+        <div id="packingChecklistForm"></div>
+    `;
+
+    const formBox = document.getElementById('packingChecklistForm');
+    listItems.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = "pack-list-item";
+        itemDiv.innerHTML = `
+            <input type="checkbox" id="pack_item_${index}" onchange="togglePackItemText(this)">
+            <label for="pack_item_${index}" style="margin:0; cursor:pointer; font-weight:500; color:#334155;">${item}</label>
+        `;
+        formBox.appendChild(itemDiv);
+    });
+}
+
+function togglePackItemText(checkbox) {
+    const label = checkbox.nextElementSibling;
+    if (checkbox.checked) {
+        label.style.textDecoration = "line-through";
+        label.style.color = "#94a3b8";
+    } else {
+        label.style.textDecoration = "none";
+        label.style.color = "#334155";
+    }
+}
+
+// FEATURE 2: SECURE USER DATA TRANSACTION TO MONGODB BACKEND INFRASTRUCTURE
+saveTripBtn.addEventListener('click', async () => {
+    if (!currentSessionUser || !activeTripDataCache) return;
+
+    saveTripBtn.innerText = "⏳ Storing inside MongoDB cluster...";
+    saveTripBtn.disabled = true;
+
+    try {
+        const response = await fetch('https://website-beckend.onrender.com/api/trips/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: currentSessionUser,
+                destination: activeTripDataCache.destination,
+                fullAddress: activeTripDataCache.fullAddress,
+                days: activeTripDataCache.days,
+                cost: activeTripDataCache.costString
+            })
+        });
+
+        if (response.ok) {
+            alert("🎉 Matrix synced successfully to secure MongoDB ledger cloud!");
+            saveTripBtn.innerText = "✅ Saved to Cloud Ledger";
+            refreshDatabaseLedgerView();
+        } else {
+            alert("Staging fault during storage sequence allocation.");
+            saveTripBtn.innerText = "💾 Save Matrix to Cloud Profile";
+            saveTripBtn.disabled = false;
+        }
+    } catch (e) {
+        alert("Database cluster connection loss.");
+        saveTripBtn.innerText = "💾 Save Matrix to Cloud Profile";
+        saveTripBtn.disabled = false;
+    }
+});
+
+// FEATURE 3: DYNAMIC REAL-TIME READOUT GENERATOR FOR ONLINE MONGO PROFILE LEDGERS (TAB 3)
+async function refreshDatabaseLedgerView() {
+    const container = document.getElementById('cloudDataContainer');
+    if (!currentSessionUser) return;
+
+    container.innerHTML = "<em>Pinging MongoDB server clusters...</em>";
+
+    try {
+        const response = await fetch(`https://website-beckend.onrender.com/api/trips/user/${currentSessionUser}`);
+        const savedTrips = await response.json();
+
+        if (!savedTrips || savedTrips.length === 0) {
+            container.innerHTML = `
+                <div style="padding:20px; color:#64748b;">
+                    🍃 Cloud link active, but no matrices saved yet. Configure variables on the Core Engine tab and hit save!
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = `<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px; text-align:left;" id="dbGridBox"></div>`;
+        const grid = document.getElementById('dbGridBox');
+
+        savedTrips.forEach(trip => {
+            const element = document.createElement('div');
+            element.style.background = "#fff";
+            element.style.border = "1px solid var(--border-color)";
+            element.style.padding = "16px";
+            element.style.borderRadius = "10px";
+            element.style.boxShadow = "0 2px 4px rgba(0,0,0,0.02)";
+            
+            element.innerHTML = `
+                <div style="font-weight:700; color:var(--text-main); font-size:15px; margin-bottom:6px;">📍 ${trip.destination}</div>
+                <div style="font-size:12px; color:var(--text-muted); line-height:1.4; margin-bottom:10px;">${trip.fullAddress}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #e2e8f0; padding-top:10px; font-size:13px;">
+                    <span style="color:#64748b; font-weight:500;">⏱️ Duration: ${trip.days} Days</span>
+                    <span style="background:#ecfdf5; color:#059669; font-weight:700; padding:3px 8px; border-radius:6px;">${trip.cost}</span>
+                </div>
+            `;
+            grid.appendChild(element);
+        });
+
+    } catch (e) {
+        container.innerHTML = "<span style='color:red;'>Could not fetch database records. Ensure your backend server is online!</span>";
+    }
+}
