@@ -4,8 +4,12 @@ document.addEventListener('click', async (e) => {
         e.preventDefault();
         console.log("Process Global Matrix button clicked!");
 
-        const inputs = document.querySelectorAll('input[type="text"], input:not([type])');
-        const destinationInput = inputs[0] ? inputs[0].value : '';
+        // FIXED: Improved selector to ensure it catches the destination text field correctly
+        const destinationElement = document.querySelector('input[placeholder*="destination" i]') || 
+                                   document.querySelector('input[type="text"]') || 
+                                   document.querySelector('input:not([type])');
+        
+        const destinationInput = destinationElement ? destinationElement.value : '';
         const daysInput = document.getElementById('days') ? document.getElementById('days').value : '5';
 
         const formData = {
@@ -14,7 +18,6 @@ document.addEventListener('click', async (e) => {
         };
 
         try {
-            // PERFECT CLOUD LINK: Matches your live Render service name with 'beckend'
             const response = await fetch('https://website-beckend-1.onrender.com/api/calculate-trip', {
                 method: 'POST',
                 headers: {
@@ -26,7 +29,9 @@ document.addEventListener('click', async (e) => {
             const result = await response.json();
 
             if (result.success) {
-                alert(`Trip Plan Successful!\nDestination: ${result.destination}\nTotal Estimated Cost: ${result.symbol}${result.totalCost}\nWeather: ${result.weather.temp}°C - ${result.weather.condition}`);
+                // FIXED: Fallback to formData if the server responds with undefined for the destination name
+                const finalDestination = result.destination || formData.destination;
+                alert(`Trip Plan Successful!\nDestination: ${finalDestination}\nTotal Estimated Cost: ${result.symbol}${result.totalCost}\nWeather: ${result.weather.temp}°C - ${result.weather.condition}`);
             } else {
                 alert('Server processed request but returned an error status.');
             }
