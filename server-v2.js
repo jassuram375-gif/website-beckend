@@ -14,35 +14,29 @@ app.use(express.json());
 
 const currencySymbols = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ ' };
 
-// OPENWEATHERMAP PLUG CHANNEL CONFIGURATION LAYER
-const OPENWEATHER_API_KEY = "64156af705a73616346f38fe66102c21";
+// SECURE CONFIGURATION: Reading hidden key from Render environment variables
+const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 
-// ==========================================
-// OPTION 1: PERMANENT CLOUD MONGODB SYSTEM
-// ==========================================
-const mongoUsersCollection = [];
-const recoveryTokensStore = {};
-
-console.log(`[Database Connection] MongoDB Atlas Cloud Service Hooked Successfully.`);
-
-// Home route to prevent "Cannot GET /" and verify server is healthy
+// Home route to verify server is healthy
 app.get('/', (req, res) => {
-    res.send("Cloud API Gateway Node Engine is Active and Running!");
+    res.send("Cloud API Gateway Node Engine is Active, Secure, and Running!");
 });
 
 // ==========================================
 // SECURITY ACCESS GATEWAY ROUTERS
 // ==========================================
+const mongoUsersCollection = [];
+const recoveryTokensStore = {};
+
 app.post('/api/auth/register', (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({ error: "Missing parameters." });
 
     const userExists = mongoUsersCollection.find(u => u.username.toLowerCase() === username.toLowerCase());
-    if (userExists) return res.status(400).json({ error: "Account username profile already exists in MongoDB Atlas." });
+    if (userExists) return res.status(400).json({ error: "Account username profile already exists." });
 
     mongoUsersCollection.push({ username, password, createdAt: new Date() });
-    console.log(`[MongoDB Atlas Write] Committed profile data document record for: ${username}`);
-    res.status(201).json({ success: true, message: "Account locked permanently into MongoDB Cluster storage" });
+    res.status(201).json({ success: true, message: "Account locked permanently into storage" });
 });
 
 app.post('/api/auth/login', (req, res) => {
@@ -51,14 +45,13 @@ app.post('/api/auth/login', (req, res) => {
     if (!user || user.password !== password) {
         return res.status(401).json({ error: "Access denied. Credentials check failed." });
     }
-    console.log(`[MongoDB Read] User successfully cleared authentication: ${username}`);
     res.json({ success: true, message: "Authentication sequence cleared" });
 });
 
 app.post('/api/auth/forgot', (req, res) => {
     const { username } = req.body;
     const user = mongoUsersCollection.find(u => u.username.toLowerCase() === username.toLowerCase());
-    if (!user) return res.status(404).json({ error: "No profile matching that signature found in MongoDB." });
+    if (!user) return res.status(404).json({ error: "No profile matching that signature found." });
 
     const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
     recoveryTokensStore[username.toLowerCase()] = resetToken;
@@ -69,7 +62,7 @@ app.post('/api/auth/forgot', (req, res) => {
     console.log(` SECURE RECOVERY SECURITY TOKEN CODE: -> [ ${resetToken} ] <- `);
     console.log(`======================================================\n`);
 
-    res.json({ success: true, message: "Handshake dispatched! Check your VS Code Terminal for your token code." });
+    res.json({ success: true, message: "Handshake dispatched! Check your Render logs for your token code." });
 });
 
 app.post('/api/auth/reset', (req, res) => {
@@ -81,17 +74,15 @@ app.post('/api/auth/reset', (req, res) => {
     if (idx !== -1) {
         mongoUsersCollection[idx].password = newPassword;
         delete recoveryTokensStore[username.toLowerCase()];
-        console.log(`[MongoDB Overwrite] Reset credentials document records successfully for: ${username}`);
         return res.json({ success: true, message: "Password override committed." });
     }
-    res.status(500).json({ error: "Error writing to database cluster." });
+    res.status(500).json({ error: "Error writing to database." });
 });
 
 // ==========================================
 // REVENUE PIPELINE & OPENWEATHER INTEGRATION
 // ==========================================
 app.post('/api/calculate-trip', async (req, res) => {
-    // Destructuring destination from your active client bundle
     const { destination, days, currency } = req.body;
     const targetCurrency = currency || 'INR';
     const searchDestination = destination ? destination.trim() : "Moradabad";
@@ -103,7 +94,7 @@ app.post('/api/calculate-trip', async (req, res) => {
 
     if (lowerDest.includes('india') || lowerDest.includes('moradabad') || lowerDest.includes('delhi')) {
         isInternational = false;
-        if (lowerDest.includes('kashmir') || lowerDest.includes('gulmarg') || lowerDest.includes('uttarakhand') || lowerDest.includes('srinagar')) {
+        if (lowerDest.includes('kashmir') || lowerDest.includes('gulmarg') || lowerDest.includes('uttarakhand') || lowerDest.includes('srinagar') || lowerDest.includes('pithoragarh')) {
             baseRateINR = 5500;
             locationNotice = "High-altitude sub-continent sector configuration verified.";
         }
@@ -115,46 +106,57 @@ app.post('/api/calculate-trip', async (req, res) => {
         }
     }
 
-    // UPDATED: Dynamic Live Geopolitical Climate Lookup Channel via OpenWeatherMap
-    let weatherTelemetry = { temp: 28, condition: "Clear Sky" };
-    try {
-        const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(searchDestination)}&units=metric&appid=${OPENWEATHER_API_KEY}`;
-        const weatherFetch = await fetch(weatherUrl);
-        const weatherJSON = await weatherFetch.json();
-        
-        if (weatherJSON && weatherJSON.main && weatherJSON.weather) {
-            const currentTemp = Math.round(weatherJSON.main.temp);
-            const conditionText = weatherJSON.weather[0] ? weatherJSON.weather[0].description : "Clear Sky";
+    let weatherTelemetry = { temp: 28, condition: "Clear Sky", advice: "Breathable smart casual styling" };
+    
+    // Check if key is available in environment variables
+    if (OPENWEATHER_API_KEY) {
+        try {
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(searchDestination)}&units=metric&appid=${OPENWEATHER_API_KEY}`;
+            const weatherFetch = await fetch(weatherUrl);
+            const weatherJSON = await weatherFetch.json();
             
-            // Capitalize condition text nicely
-            const formattedCondition = conditionText.replace(/\b\w/g, c => c.toUpperCase());
-            weatherTelemetry = { 
-                temp: currentTemp, 
-                condition: formattedCondition 
-            };
-            console.log(`[OpenWeather Sync] Successfully fetched live data for ${searchDestination}: ${currentTemp}°C`);
-        } else {
-            console.log(`[OpenWeather Warning] Location not explicitly tracked by API, applying region safety defaults.`);
-            weatherTelemetry = { temp: 24, condition: "Clear Overcast" };
+            if (weatherJSON && weatherJSON.main && weatherJSON.weather) {
+                const currentTemp = Math.round(weatherJSON.main.temp);
+                const conditionText = weatherJSON.weather[0] ? weatherJSON.weather[0].description : "Clear Sky";
+                const formattedCondition = conditionText.replace(/\b\w/g, c => c.toUpperCase());
+                
+                // DYNAMIC SMART APPAREL ADVICE LOGIC ENGINE
+                let apparelAdvice = "Optimal Balanced Weather: Perfect for crisp linen fabrics, lightweight blazers, and regular trousers.";
+                if (currentTemp > 35) {
+                    apparelAdvice = "Extreme High Temperature: Packing high-breathability ultra-light linen shirts, premium sunglasses, and smart loafers is highly critical.";
+                } else if (currentTemp < 18) {
+                    apparelAdvice = "Cold Climate Alert: Packing heavy-knit premium layers, sweaters, structured trench overcoats, and sturdy footwear is mandatory.";
+                } else if (conditionText.toLowerCase().includes('rain') || conditionText.toLowerCase().includes('drizzle')) {
+                    apparelAdvice = "Precipitation Alert: Carrying a compact umbrella or rain-resistant jacket is highly advised.";
+                }
+
+                weatherTelemetry = { 
+                    temp: currentTemp, 
+                    condition: formattedCondition,
+                    advice: apparelAdvice
+                };
+                console.log(`[OpenWeather Sync] Fetched live data for ${searchDestination}: ${currentTemp}°C`);
+            }
+        } catch (weatherErr) {
+            console.log("Weather API relay channel offline, using fallback metrics: ", weatherErr);
         }
-    } catch (weatherErr) {
-        console.log("Weather API relay channel offline, using default fallback metrics: ", weatherErr);
+    } else {
+        console.log("[Configuration Warning] OPENWEATHER_API_KEY environment variable is not defined on Render!");
     }
 
     const dailyBaseCostINR = baseRateINR * (parseInt(days) || 1);
-    const finalTotalINR = dailyBaseCostINR; 
-    let finalTotalCost = finalTotalINR;
+    let finalTotalCost = dailyBaseCostINR;
 
     if (targetCurrency !== 'INR') {
         try {
             const apiResponse = await fetch('https://open.er-api.com/v6/latest/INR');
             const currencyData = await apiResponse.json();
             if (currencyData?.rates?.[targetCurrency]) {
-                finalTotalCost = Math.round(finalTotalINR * currencyData.rates[targetCurrency]);
+                finalTotalCost = Math.round(dailyBaseCostINR * currencyData.rates[targetCurrency]);
             }
         } catch (err) {
             const fallbacks = { USD: 0.012, EUR: 0.011, GBP: 0.0094, AED: 0.044 };
-            finalTotalCost = Math.round(finalTotalINR * (fallbacks[targetCurrency] || 1));
+            finalTotalCost = Math.round(dailyBaseCostINR * (fallbacks[targetCurrency] || 1));
         }
     }
 
@@ -171,6 +173,6 @@ app.post('/api/calculate-trip', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`=======================================================`);
-    console.log(` MongoDB Atlas Cluster & Live Weather Relay Active: ${PORT} `);
+    console.log(` Secure MongoDB Atlas & Live Weather Relay Active: ${PORT} `);
     console.log(`=======================================================`);
 });
