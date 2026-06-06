@@ -4,44 +4,32 @@ document.addEventListener('click', async (e) => {
         e.preventDefault();
         console.log("Process Global Matrix button clicked!");
 
-        // 1. Find the label element that says "Enter Global Destination:"
-        const labels = Array.from(document.querySelectorAll('label, div, p, span'));
-        const destinationLabel = labels.find(el => el.textContent.trim().includes('Enter Global Destination:'));
+        // 1. Target form elements explicitly via explicit DOM ID mappings
+        const destinationField = document.getElementById('destination');
+        const daysField = document.getElementById('days');
         
-        let destinationInput = '';
-
-        // 2. Grab the input field right next to or inside that label
-        if (destinationLabel) {
-            const nextInput = destinationLabel.nextElementSibling?.querySelector('input') || 
-                              destinationLabel.nextElementSibling || 
-                              destinationLabel.querySelector('input');
-            if (nextInput && nextInput.tagName === 'INPUT') {
-                destinationInput = nextInput.value;
-            }
-        }
-
-        // 3. Absolute fallback: if the label trick missed, check every text input on the page
-        if (!destinationInput) {
-            const allInputs = document.querySelectorAll('input[type="text"], input:not([type])');
-            for (let input of allInputs) {
-                if (input.value.trim() !== '') {
-                    destinationInput = input.value;
-                    break;
-                }
-            }
-        }
-
-        const daysInput = document.getElementById('days') ? document.getElementById('days').value : '5';
-
-        // Final cleanup of the text
-        const finalDestinationText = destinationInput.trim() || "Paris";
+        const destinationValue = destinationField ? destinationField.value.trim() : 'Moradabad';
+        const daysValue = daysField ? daysField.value : '5';
 
         const formData = {
-            destination: finalDestinationText,
-            days: daysInput
+            destination: destinationValue || "Moradabad",
+            days: daysValue
         };
 
+        // Target the display wrapper container inside Geographical Radar card
+        const targetDisplay = document.getElementById('results-display-wrapper');
+
         try {
+            // Inject an elegant on-screen active loading indicator state
+            if (targetDisplay) {
+                targetDisplay.innerHTML = `
+                    <div style="text-align: center; padding: 15px;">
+                        <strong style="color: var(--accent-blue); display: block; margin-bottom: 5px; animation: pulse 1.5s infinite;">⚡ Processing Global Matrix...</strong>
+                        <span style="font-size: 12px; color: var(--text-muted);">Requesting Render Cloud Microservice...</span>
+                    </div>
+                `;
+            }
+
             const response = await fetch('https://website-beckend-1.onrender.com/api/calculate-trip', {
                 method: 'POST',
                 headers: {
@@ -52,17 +40,47 @@ document.addEventListener('click', async (e) => {
 
             const result = await response.json();
 
-            if (result.success) {
-                // Display exactly what the server processed or what the user typed
+            if (result.success && targetDisplay) {
                 const displayDestination = result.destination || formData.destination;
-                alert(`Trip Plan Successful!\nDestination: ${displayDestination}\nTotal Estimated Cost: ${result.symbol}${result.totalCost}\nWeather: ${result.weather.temp}°C - ${result.weather.condition}`);
+                
+                // Inject the cloud microservice calculation properties cleanly into the UI grid wrapper
+                targetDisplay.innerHTML = `
+                    <div class="ui-result-card-inner">
+                        <h3 style="margin: 0 0 15px 0; font-size: 15px; text-align: left; color: var(--text-main); border-bottom: 2px solid var(--accent-blue); padding-bottom: 8px; font-weight: 700;">
+                            🌍 ${displayDestination.toUpperCase()} MATRIX COMPLETED
+                        </h3>
+                        <div class="ui-result-item">
+                            <span>📅 Total Duration:</span>
+                            <strong style="color: var(--text-main);">${formData.days} Days</strong>
+                        </div>
+                        <div class="ui-result-item">
+                            <span>🌤️ Current Climate:</span>
+                            <strong style="color: var(--text-main);">${result.weather.temp}°C — ${result.weather.condition}</strong>
+                        </div>
+                        <div class="ui-result-item">
+                            <span>💰 Calculation Matrix Total:</span>
+                            <strong style="color: #059669; font-size: 16px;">${result.symbol}${result.totalCost.toLocaleString()}</strong>
+                        </div>
+                    </div>
+                `;
             } else {
-                alert('Server processed request but returned an error status.');
+                if (targetDisplay) {
+                    targetDisplay.innerHTML = `<strong style="color: #ef4444;">⚠️ Core cloud cluster returned a processing fault.</strong>`;
+                }
             }
 
         } catch (error) {
             console.error('Network Error:', error);
-            alert(`Waking up the cloud server...\nIf this is the first click in a while, please wait 30-50 seconds for Render to spin up!`);
+            if (targetDisplay) {
+                targetDisplay.innerHTML = `
+                    <div style="text-align: left; background: #fff9db; border-left: 4px solid #f59f00; padding: 12px; border-radius: 6px;">
+                        <strong style="color: #f08c00; display: block; margin-bottom: 4px; font-size: 13px;">☁️ Synchronizing Cloud Clusters...</strong>
+                        <span style="font-size: 12px; color: #665c00; line-height: 1.4; display: block;">
+                            Render microservices are waking up from a deep energy sleep cycle. Please wait 30-40 seconds for full ledger initialization and re-click!
+                        </span>
+                    </div>
+                `;
+            }
         }
     }
 });
