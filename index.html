@@ -154,7 +154,7 @@
             width: 100%;
         }
 
-        /* MOBILE FIRST LAYOUT: Cards take 100% full width by default so they aren't congested */
+        /* MOBILE FIRST LAYOUT */
         .card {
             background: var(--card-bg);
             padding: 25px;
@@ -215,6 +215,18 @@
 
         .pack-list-item { display: flex; align-items: center; background: #fff; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; font-size: 13px; }
         .pack-list-item input { width: auto; margin-right: 12px; transform: scale(1.2); }
+
+        /* UPGRADED CLOTHING DISPLAY STYLING SLOTS */
+        .clothing-advice-highlight-box {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 12px;
+            font-size: 13.5px;
+            color: #166534;
+            line-height: 1.5;
+        }
 
         .clearfix::after { content: ""; clear: both; display: table; }
 
@@ -329,6 +341,10 @@
                     <div id="results-display-wrapper">
                         <strong id="radarStatus" style="font-size: 14px; color: var(--accent-blue);">Awaiting System Input Coordinates...</strong>
                         <p id="systemNotice" style="font-size: 13px; color: var(--text-muted); margin: 6px 0 0 0;">Enter any worldwide destination and run the engine calculation matrix.</p>
+                        
+                        <div id="serverClothingAdviceCard" class="clothing-advice-highlight-box" style="display: none;">
+                            👕 <strong>Smart Style Engine Recommendation:</strong> <span id="weather-clothing-advice"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -343,6 +359,11 @@
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
                     This smart engine automatically syncs with our global weather radar channels to generate custom checklist layouts. Run a target route computation on the Core Engine page first to sync this tool!
                 </p>
+                
+                <div id="liveSyncStatusBanner" style="display:none; margin-bottom:15px; padding:12px; background:#f0fdf4; border-left:4px solid #16a34a; border-radius:6px; font-size:13px; color:#15803d; font-weight:600;">
+                    🔄 Live Radar Sync Active: Wardrobe parameters calculated cleanly for your trip!
+                </div>
+
                 <div id="packingListTargetContainer">
                     <div style="text-align: center; padding: 30px; color: var(--text-muted); border: 2px dashed var(--border-color); border-radius: 12px; font-size: 13px;">
                         ⚠️ Load coordinates on the Core Engine tab first to trigger the radar climate sync layer.
