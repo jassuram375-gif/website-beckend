@@ -43,26 +43,42 @@ document.addEventListener('click', async (e) => {
             if (result.success && targetDisplay) {
                 const displayDestination = result.destination || formData.destination;
                 
+                // Extract weather details safely with defensive defaults
+                const currentTemp = result.weather ? result.weather.temp : 24;
+                const currentCondition = result.weather ? result.weather.condition : "Clear Overcast";
+                const clothingAdvice = result.weather ? result.weather.advice : "Optimal Balanced Weather: Perfect for crisp linen fabrics and lightweight regular trousers.";
+
                 // Inject the cloud microservice calculation properties cleanly into the UI grid wrapper
                 targetDisplay.innerHTML = `
                     <div class="ui-result-card-inner">
                         <h3 style="margin: 0 0 15px 0; font-size: 15px; text-align: left; color: var(--text-main); border-bottom: 2px solid var(--accent-blue); padding-bottom: 8px; font-weight: 700;">
                             🌍 ${displayDestination.toUpperCase()} MATRIX COMPLETED
                         </h3>
-                        <div class="ui-result-item">
+                        <div class="ui-result-item" style="margin-bottom: 10px; font-size: 13px;">
                             <span>📅 Total Duration:</span>
                             <strong style="color: var(--text-main);">${formData.days} Days</strong>
                         </div>
-                        <div class="ui-result-item">
+                        <div class="ui-result-item" style="margin-bottom: 10px; font-size: 13px;">
                             <span>🌤️ Current Climate:</span>
-                            <strong style="color: var(--text-main);">${result.weather.temp}°C — ${result.weather.condition}</strong>
+                            <strong style="color: var(--text-main);">${currentTemp}°C — ${currentCondition}</strong>
                         </div>
-                        <div class="ui-result-item">
+                        <div class="ui-result-item" style="margin-bottom: 15px; font-size: 13px;">
                             <span>💰 Calculation Matrix Total:</span>
                             <strong style="color: #059669; font-size: 16px;">${result.symbol}${result.totalCost.toLocaleString()}</strong>
                         </div>
+                        
+                        <div class="clothing-advice-highlight-box" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px; border-radius: 10px; margin-top: 12px; font-size: 13px; color: #166534; line-height: 1.5; text-align: left;">
+                            👕 <strong>Smart Style Engine Recommendation:</strong><br>
+                            <span id="weather-clothing-advice">${clothingAdvice}</span>
+                        </div>
                     </div>
                 `;
+
+                // Turn on the extra status banner inside your Packing Assistant Tab if it exists
+                if (document.getElementById('liveSyncStatusBanner')) {
+                    document.getElementById('liveSyncStatusBanner').style.display = 'block';
+                }
+
             } else {
                 if (targetDisplay) {
                     targetDisplay.innerHTML = `<strong style="color: #ef4444;">⚠️ Core cloud cluster returned a processing fault.</strong>`;
