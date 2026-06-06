@@ -218,7 +218,7 @@
 
         .clearfix::after { content: ""; clear: both; display: table; }
 
-        /* 💻 DESKTOP MEDIA QUERY: Automatically snaps items back side-by-side on large laptop screens */
+        /* 💻 DESKTOP MEDIA QUERY */
         @media (min-width: 768px) {
             body { padding: 30px; }
             .navbar-suite { flex-direction: row; padding: 15px 30px; }
@@ -324,9 +324,12 @@
                 </h2>
                 <div class="weather-badge" id="weatherTelemetryContainer"></div>
                 <div id="mapBoxContainer"></div>
-                <div id="dynamicWardrobe" class="result-box wardrobe-section" style="display:block; margin-top:25px;">
-                    <strong id="radarStatus">Awaiting System Input Coordinates...</strong>
-                    <p id="systemNotice" style="font-size: 13px; color: var(--text-muted);">Enter any worldwide destination and run the engine calculation matrix.</p>
+                
+                <div id="dynamicWardrobe" class="result-box wardrobe-section" style="display:block; margin-top:25px; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main);">
+                    <div id="results-display-wrapper">
+                        <strong id="radarStatus" style="font-size: 14px; color: var(--accent-blue);">Awaiting System Input Coordinates...</strong>
+                        <p id="systemNotice" style="font-size: 13px; color: var(--text-muted); margin: 6px 0 0 0;">Enter any worldwide destination and run the engine calculation matrix.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -392,6 +395,6 @@
             }
         }
     </script>
-    <script src="planner-bridge.js?v=final_patch_9"></script>
+    <script src="planner-bridge.js"></script>
 </body>
 </html>
