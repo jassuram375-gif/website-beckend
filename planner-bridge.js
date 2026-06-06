@@ -1,10 +1,87 @@
 // --- planner-bridge.js ---
+
+// Local database index map for lightning-fast auto-complete suggestions
+const destinationDatabase = [
+    "Moradabad, Uttar Pradesh, India",
+    "Delhi, NCR, India",
+    "Pithoragarh, Uttarakhand, India",
+    "Srinagar, Jammu & Kashmir, India",
+    "Gulmarg, Jammu & Kashmir, India",
+    "Pahalgam, Jammu & Kashmir, India",
+    "Lal Kuan, Uttarakhand, India",
+    "London, United Kingdom",
+    "Paris, France",
+    "Dubai, United Arab Emirates"
+];
+
+// Wait for the DOM to load before setting up our input listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const destInput = document.getElementById('destination');
+    const suggestionsBox = document.getElementById('autocomplete-suggestions');
+
+    if (destInput && suggestionsBox) {
+        // Listen to everything the user types inside the input box
+        destInput.addEventListener('input', () => {
+            const query = destInput.value.trim().toLowerCase();
+            suggestionsBox.innerHTML = ''; // Clear out past results
+
+            if (!query) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            // Filter the database for items matching the typed query
+            const filtered = destinationDatabase.filter(item => 
+                item.toLowerCase().includes(query)
+            );
+
+            if (filtered.length > 0) {
+                filtered.forEach(city => {
+                    const div = document.createElement('div');
+                    div.textContent = city;
+                    div.style.padding = '12px 14px';
+                    div.style.cursor = 'pointer';
+                    div.style.fontSize = '13.5px';
+                    div.style.borderBottom = '1px solid var(--border-color)';
+                    div.style.color = 'var(--text-main)';
+                    
+                    // Hover background effect
+                    div.addEventListener('mouseenter', () => {
+                        div.style.background = 'var(--bg-color)';
+                    });
+                    div.addEventListener('mouseleave', () => {
+                        div.style.background = 'transparent';
+                    });
+
+                    // When user clicks a suggestion, inject it into the text box
+                    div.addEventListener('click', () => {
+                        destInput.value = city.split(',')[0]; // Grabs just the city name (e.g., "Moradabad")
+                        suggestionsBox.style.display = 'none';
+                    });
+
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = 'block';
+            } else {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        // Hide suggestions dropdown if user clicks anywhere outside the input box
+        document.addEventListener('click', (e) => {
+            if (e.target !== destInput && e.target !== suggestionsBox) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+    }
+});
+
+// Main click router interface calculation script
 document.addEventListener('click', async (e) => {
     if (e.target && e.target.textContent.trim() === 'Process Global Matrix') {
         e.preventDefault();
         console.log("Process Global Matrix button clicked!");
 
-        // 1. Target form elements explicitly via explicit DOM ID mappings
         const destinationField = document.getElementById('destination');
         const daysField = document.getElementById('days');
         
@@ -16,11 +93,9 @@ document.addEventListener('click', async (e) => {
             days: daysValue
         };
 
-        // Target the display wrapper container inside Geographical Radar card
         const targetDisplay = document.getElementById('results-display-wrapper');
 
         try {
-            // Inject an elegant on-screen active loading indicator state
             if (targetDisplay) {
                 targetDisplay.innerHTML = `
                     <div style="text-align: center; padding: 15px;">
@@ -43,12 +118,10 @@ document.addEventListener('click', async (e) => {
             if (result.success && targetDisplay) {
                 const displayDestination = result.destination || formData.destination;
                 
-                // Extract weather details safely with defensive defaults
                 const currentTemp = result.weather ? result.weather.temp : 24;
                 const currentCondition = result.weather ? result.weather.condition : "Clear Overcast";
                 const clothingAdvice = result.weather ? result.weather.advice : "Optimal Balanced Weather: Perfect for crisp linen fabrics and lightweight regular trousers.";
 
-                // Inject the cloud microservice calculation properties cleanly into the UI grid wrapper
                 targetDisplay.innerHTML = `
                     <div class="ui-result-card-inner">
                         <h3 style="margin: 0 0 15px 0; font-size: 15px; text-align: left; color: var(--text-main); border-bottom: 2px solid var(--accent-blue); padding-bottom: 8px; font-weight: 700;">
@@ -67,14 +140,13 @@ document.addEventListener('click', async (e) => {
                             <strong style="color: #059669; font-size: 16px;">${result.symbol}${result.totalCost.toLocaleString()}</strong>
                         </div>
                         
-                        <div class="clothing-advice-highlight-box" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px; border-radius: 10px; margin-top: 12px; font-size: 13px; color: #166534; line-height: 1.5; text-align: left;">
+                        <div class="clothing-advice-highlight-box" style="padding: 14px; border-radius: 10px; margin-top: 12px; font-size: 13px; line-height: 1.5; text-align: left;">
                             👕 <strong>Smart Style Engine Recommendation:</strong><br>
                             <span id="weather-clothing-advice">${clothingAdvice}</span>
                         </div>
                     </div>
                 `;
 
-                // Turn on the extra status banner inside your Packing Assistant Tab if it exists
                 if (document.getElementById('liveSyncStatusBanner')) {
                     document.getElementById('liveSyncStatusBanner').style.display = 'block';
                 }
