@@ -4,16 +4,40 @@ document.addEventListener('click', async (e) => {
         e.preventDefault();
         console.log("Process Global Matrix button clicked!");
 
-        // FIXED: Improved selector to ensure it catches the destination text field correctly
-        const destinationElement = document.querySelector('input[placeholder*="destination" i]') || 
-                                   document.querySelector('input[type="text"]') || 
-                                   document.querySelector('input:not([type])');
+        // 1. Find the label element that says "Enter Global Destination:"
+        const labels = Array.from(document.querySelectorAll('label, div, p, span'));
+        const destinationLabel = labels.find(el => el.textContent.trim().includes('Enter Global Destination:'));
         
-        const destinationInput = destinationElement ? destinationElement.value : '';
+        let destinationInput = '';
+
+        // 2. Grab the input field right next to or inside that label
+        if (destinationLabel) {
+            const nextInput = destinationLabel.nextElementSibling?.querySelector('input') || 
+                              destinationLabel.nextElementSibling || 
+                              destinationLabel.querySelector('input');
+            if (nextInput && nextInput.tagName === 'INPUT') {
+                destinationInput = nextInput.value;
+            }
+        }
+
+        // 3. Absolute fallback: if the label trick missed, check every text input on the page
+        if (!destinationInput) {
+            const allInputs = document.querySelectorAll('input[type="text"], input:not([type])');
+            for (let input of allInputs) {
+                if (input.value.trim() !== '') {
+                    destinationInput = input.value;
+                    break;
+                }
+            }
+        }
+
         const daysInput = document.getElementById('days') ? document.getElementById('days').value : '5';
 
+        // Final cleanup of the text
+        const finalDestinationText = destinationInput.trim() || "Paris";
+
         const formData = {
-            destination: destinationInput || "Uttarakhand",
+            destination: finalDestinationText,
             days: daysInput
         };
 
@@ -29,9 +53,9 @@ document.addEventListener('click', async (e) => {
             const result = await response.json();
 
             if (result.success) {
-                // FIXED: Fallback to formData if the server responds with undefined for the destination name
-                const finalDestination = result.destination || formData.destination;
-                alert(`Trip Plan Successful!\nDestination: ${finalDestination}\nTotal Estimated Cost: ${result.symbol}${result.totalCost}\nWeather: ${result.weather.temp}°C - ${result.weather.condition}`);
+                // Display exactly what the server processed or what the user typed
+                const displayDestination = result.destination || formData.destination;
+                alert(`Trip Plan Successful!\nDestination: ${displayDestination}\nTotal Estimated Cost: ${result.symbol}${result.totalCost}\nWeather: ${result.weather.temp}°C - ${result.weather.condition}`);
             } else {
                 alert('Server processed request but returned an error status.');
             }
