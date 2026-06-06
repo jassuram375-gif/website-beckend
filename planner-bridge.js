@@ -14,6 +14,10 @@ const destinationDatabase = [
     "Dubai, United Arab Emirates"
 ];
 
+// Global map reference pointer token to prevent map layering conflicts
+let globalMapInstance = null;
+let globalMarkerInstance = null;
+
 // Wait for the DOM to load before setting up our input listeners
 document.addEventListener('DOMContentLoaded', () => {
     const destInput = document.getElementById('destination');
@@ -94,6 +98,7 @@ document.addEventListener('click', async (e) => {
         };
 
         const targetDisplay = document.getElementById('results-display-wrapper');
+        const mapContainer = document.getElementById('mapBoxContainer');
 
         try {
             if (targetDisplay) {
@@ -122,6 +127,7 @@ document.addEventListener('click', async (e) => {
                 const currentCondition = result.weather ? result.weather.condition : "Clear Overcast";
                 const clothingAdvice = result.weather ? result.weather.advice : "Optimal Balanced Weather: Perfect for crisp linen fabrics and lightweight regular trousers.";
 
+                // Render out our core matrix calculations text card
                 targetDisplay.innerHTML = `
                     <div class="ui-result-card-inner">
                         <h3 style="margin: 0 0 15px 0; font-size: 15px; text-align: left; color: var(--text-main); border-bottom: 2px solid var(--accent-blue); padding-bottom: 8px; font-weight: 700;">
@@ -149,6 +155,53 @@ document.addEventListener('click', async (e) => {
 
                 if (document.getElementById('liveSyncStatusBanner')) {
                     document.getElementById('liveSyncStatusBanner').style.display = 'block';
+                }
+
+                // ==========================================
+                // GEOGRAPHICAL RADAR: LEAFLET MAP ENGINE INTERFACING
+                // ==========================================
+                if (mapContainer) {
+                    mapContainer.style.display = 'block'; // Make the map visible!
+                    
+                    // Fallback map lookups if specific telemetry lat/lon values aren't populated
+                    let lat = 28.8386; // Default: Moradabad Coordinates
+                    let lon = 78.7733;
+
+                    // Match coordinate parameters based on standard region keywords
+                    const lowerDest = displayDestination.toLowerCase();
+                    if (lowerDest.includes('pithoragarh')) { lat = 29.5829; lon = 80.2182; }
+                    else if (lowerDest.includes('delhi')) { lat = 28.6139; lon = 77.2090; }
+                    else if (lowerDest.includes('london')) { lat = 51.5074; lon = -0.1278; }
+                    else if (lowerDest.includes('paris')) { lat = 48.8566; lon = 2.3522; }
+                    else if (lowerDest.includes('dubai')) { lat = 25.2048; lon = 55.2708; }
+                    else if (lowerDest.includes('srinagar')) { lat = 34.0837; lon = 74.7973; }
+                    else if (lowerDest.includes('gulmarg')) { lat = 34.0484; lon = 74.3805; }
+                    else if (lowerDest.includes('pahalgam')) { lat = 34.0161; lon = 75.3150; }
+                    else if (lowerDest.includes('lal kuan')) { lat = 29.0734; lon = 79.5103; }
+
+                    // Initialize Leaflet Map view if it doesn't exist yet
+                    if (!globalMapInstance) {
+                        globalMapInstance = L.map('mapBoxContainer').setView([lat, lon], 11);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '© OpenStreetMap contributors'
+                        }).addTo(globalMapInstance);
+                    } else {
+                        // Fly smoothly to the new destination if map is already rendered
+                        globalMapInstance.flyTo([lat, lon], 11, { animate: true, duration: 1.5 });
+                    }
+
+                    // Remove old pins to prevent cluttered UI screens
+                    if (globalMarkerInstance) {
+                        globalMapInstance.removeLayer(globalMarkerInstance);
+                    }
+
+                    // Drop a brand new, highly visible pinpoint marker on the grid coordinate
+                    globalMarkerInstance = L.marker([lat, lon]).addTo(globalMapInstance)
+                        .bindPopup(`<b>${displayDestination}</b><br>Radar Telemetry Channel Synced.`)
+                        .openPopup();
+
+                    // Force Leaflet to resize correctly within responsive wrapper grids
+                    setTimeout(() => { globalMapInstance.invalidateSize(); }, 300);
                 }
 
             } else {
