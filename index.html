@@ -12,7 +12,7 @@
 
     <style>
         :root {
-            --bg-color: #f8fafc;
+            --bg-color: radial-gradient(circle at top left, #f1f5f9 0%, #cbd5e1 100%);
             --card-bg: #ffffff;
             --text-main: #0f172a;
             --text-muted: #475569;
@@ -20,15 +20,30 @@
             --accent-blue: #3b82f6;
             --border-color: #e2e8f0;
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --toggle-bg: #e2e8f0;
+        }
+
+        /* DOCKING SYSTEM: Advanced Dark Palette Variable Matrices Override */
+        body.dark-theme {
+            --bg-color: radial-gradient(circle at top left, #0f172a 0%, #020617 100%);
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            --toggle-bg: #334155;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: radial-gradient(circle at top left, #f1f5f9 0%, #cbd5e1 100%);
+            background: var(--bg-color);
             margin: 0;
             padding: 15px;
             min-height: 100vh;
             box-sizing: border-box;
+            color: var(--text-main);
+            /* Smooth transitions across all layout tokens */
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .layout-container {
@@ -47,7 +62,8 @@
             flex-direction: column;
             gap: 15px;
             align-items: center;
-            border: 1px solid rgba(255,255,255,0.7);
+            border: 1px solid var(--border-color);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .nav-links {
@@ -75,8 +91,13 @@
             color: var(--accent-blue);
         }
 
+        body.dark-theme .nav-tab-btn.active {
+            background: #1e3a8a;
+            color: #60a5fa;
+        }
+
         .nav-tab-btn:hover:not(.active) {
-            background: #f1f5f9;
+            background: var(--toggle-bg);
             color: var(--text-main);
         }
 
@@ -86,8 +107,9 @@
             border-radius: 16px;
             box-shadow: var(--shadow);
             margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.7);
+            border: 1px solid var(--border-color);
             text-align: center;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .header-title {
@@ -100,7 +122,7 @@
         .auth-toggle-btn {
             padding: 10px 20px;
             background-color: var(--text-main);
-            color: white;
+            color: var(--card-bg);
             border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
@@ -108,6 +130,7 @@
             border: none;
             width: 100%;
             max-width: 200px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .app-view-panel {
@@ -162,8 +185,9 @@
             box-shadow: var(--shadow);
             width: 100%;
             box-sizing: border-box;
-            border: 1px solid rgba(255,255,255,0.7);
+            border: 1px solid var(--border-color);
             margin-bottom: 25px;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .card.right-card {
@@ -196,24 +220,34 @@
             border: 1px solid #dbeafe;
         }
 
+        body.dark-theme .owner-badge-inline {
+            background: #1e3a8a;
+            color: #60a5fa;
+            border: 1px solid #1e40af;
+        }
+
         .input-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: var(--text-main); }
-        input, select { width: 100%; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 14px; color: var(--text-main); background-color: #f8fafc; }
-        input:focus, select:focus { outline: none; border-color: var(--accent-green); background-color: #fff; }
+        input, select { width: 100%; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 14px; color: var(--text-main); background-color: var(--bg-color); transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
+        input:focus, select:focus { outline: none; border-color: var(--accent-green); background-color: var(--card-bg); }
 
-        .checkbox-container { background: #f8fafc; border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .checkbox-container { background: var(--bg-color); border: 1px solid var(--border-color); padding: 15px; border-radius: 10px; margin-bottom: 20px; transition: background-color 0.3s ease, border-color 0.3s ease; }
         .checkbox-item { display: block; margin-bottom: 10px; cursor: pointer; font-size: 13px; font-weight: 500; }
         .checkbox-item input { width: auto; margin-right: 10px; transform: scale(1.1); }
 
         button.main-btn { width: 100%; padding: 14px; background-color: var(--accent-green); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
         button.main-btn:hover { background-color: #059669; transform: translateY(-1px); }
 
-        .result-box { margin-top: 25px; padding: 16px; background: #ecfdf5; border-left: 5px solid var(--accent-green); border-radius: 8px; display: none; font-size: 14px; }
+        .result-box { margin-top: 25px; padding: 16px; background: #ecfdf5; border-left: 5px solid var(--accent-green); border-radius: 8px; display: none; font-size: 14px; color: #065f46; }
+        body.dark-theme .result-box { background: #064e3b; border-left: 5px solid var(--accent-green); color: #a7f3d0; }
+        
         .wardrobe-section { margin-bottom: 15px; border-left: 5px solid var(--accent-blue); background: #eff6ff; padding: 15px; border-radius: 8px; }
+        body.dark-theme .wardrobe-section { background: #1e3a8a; border-left: 5px solid var(--accent-blue); }
+
         .weather-badge { border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: var(--text-main); display: none; }
         #mapBoxContainer { width: 100%; height: 250px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--border-color); display: none; z-index: 1; }
 
-        .pack-list-item { display: flex; align-items: center; background: #fff; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; font-size: 13px; }
+        .pack-list-item { display: flex; align-items: center; background: var(--card-bg); padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; font-size: 13px; }
         .pack-list-item input { width: auto; margin-right: 12px; transform: scale(1.2); }
 
         /* UPGRADED CLOTHING DISPLAY STYLING SLOTS */
@@ -226,6 +260,11 @@
             font-size: 13.5px;
             color: #166534;
             line-height: 1.5;
+        }
+        body.dark-theme .clothing-advice-highlight-box {
+            background-color: #064e3b;
+            border: 1px solid #047857;
+            color: #a7f3d0;
         }
 
         .clearfix::after { content: ""; clear: both; display: table; }
@@ -258,13 +297,17 @@
                 <button class="nav-tab-btn" onclick="switchSuiteView('packingView', this)">🧳 Smart Packing Tool</button>
                 <button class="nav-tab-btn" onclick="switchSuiteView('databaseView', this)">💾 Cloud Saved Trips</button>
             </div>
-            <button class="auth-toggle-btn" id="accountMenuBtn">Sign In / Register</button>
+            
+            <div style="display: flex; gap: 10px; align-items: center; width: 100%; justify-content: center; max-width: 420px;">
+                <button id="themeToggleBtn" style="padding: 10px 14px; background: var(--toggle-bg); color: var(--text-main); border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border-color); flex: 1; transition: all 0.2s ease;">🌓 Toggle Dark Mode</button>
+                <button class="auth-toggle-btn" id="accountMenuBtn" style="flex: 1; margin: 0; max-width: 100%;">Sign In / Register</button>
+            </div>
         </nav>
 
         <div class="header-bar">
             <h1 class="header-title">Global Next-Gen Travel Suite Pro</h1>
             <div style="margin-top: 10px; font-size: 12px; color: var(--text-muted); font-weight: 500;">
-                🛡️ Platform System Owner: <span style="color: var(--accent-blue); font-weight: 700; background: #eff6ff; padding: 3px 8px; border-radius: 6px; border: 1px solid #dbeafe;">Krish Ringwal</span>
+                🛡️ Platform System Owner: <span style="color: var(--accent-blue); font-weight: 700; background: #eff6ff; padding: 3px 8px; border-radius: 6px; border: 1px solid #dbeafe;" class="owner-badge-inline">Krish Ringwal</span>
             </div>
         </div>
 
@@ -285,7 +328,7 @@
                     <span style="display:block; margin-top:6px; font-size:12px; color:var(--accent-blue); cursor:pointer;" id="forgotPasswordLink">Forgot Password?</span>
                 </div>
                 <div class="auth-inline-group" style="padding-top: 20px;">
-                    <button class="auth-toggle-btn" id="authActionBtn" style="background: var(--accent-blue); max-width: 100%;">Execute Login</button>
+                    <button class="auth-toggle-btn" id="authActionBtn" style="background: var(--accent-blue); max-width: 100%; color: white;">Execute Login</button>
                 </div>
             </div>
             <div id="authStatusAlert" style="margin-top:15px; font-size:13px; font-weight:600; display:none;"></div>
@@ -337,7 +380,7 @@
                 <div class="weather-badge" id="weatherTelemetryContainer"></div>
                 <div id="mapBoxContainer"></div>
                 
-                <div id="dynamicWardrobe" class="result-box wardrobe-section" style="display:block; margin-top:25px; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-main);">
+                <div id="dynamicWardrobe" class="result-box wardrobe-section" style="display:block; margin-top:25px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main);">
                     <div id="results-display-wrapper">
                         <strong id="radarStatus" style="font-size: 14px; color: var(--accent-blue);">Awaiting System Input Coordinates...</strong>
                         <p id="systemNotice" style="font-size: 13px; color: var(--text-muted); margin: 6px 0 0 0;">Enter any worldwide destination and run the engine calculation matrix.</p>
@@ -381,7 +424,7 @@
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
                     Below is the live tracking index pulled directly from our database server clusters. Ensure you are signed into your global profile link to access telemetry data logs.
                 </p>
-                <div id="cloudDataContainer" style="font-size: 13px; background: #f8fafc; border: 1px dashed var(--border-color); padding: 25px; text-align: center; border-radius: 12px; color: var(--text-muted);">
+                <div id="cloudDataContainer" style="font-size: 13px; background: var(--bg-color); border: 1px dashed var(--border-color); padding: 25px; text-align: center; border-radius: 12px; color: var(--text-muted);">
                     🔒 Verification Required. Please log into your Profile Account via the upper corner dashboard interface.
                 </div>
             </div>
@@ -416,6 +459,29 @@
             }
         }
     </script>
+    
+    <script>
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        
+        // Retain client state profile tracking on screen reboots
+        if (localStorage.getItem('userThemePreference') === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeToggleBtn.textContent = "☀️ Light Mode";
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            
+            if (document.body.classList.contains('dark-theme')) {
+                localStorage.setItem('userThemePreference', 'dark');
+                themeToggleBtn.textContent = "☀️ Light Mode";
+            } else {
+                localStorage.setItem('userThemePreference', 'light');
+                themeToggleBtn.textContent = "🌓 Toggle Dark Mode";
+            }
+        });
+    </script>
+    
     <script src="planner-bridge.js"></script>
 </body>
 </html>
