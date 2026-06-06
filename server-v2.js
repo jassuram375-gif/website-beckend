@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const PORT = process.env.PORT || 3000; // Updated to dynamically read Render's port environment variable
+const PORT = process.env.PORT || 3000;
 
 // Enhanced security headers allowing your specific phone & GitHub Pages link access
 app.use(cors({
@@ -13,6 +13,9 @@ app.use(cors({
 app.use(express.json());
 
 const currencySymbols = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ ' };
+
+// OPENWEATHERMAP PLUG CHANNEL CONFIGURATION LAYER
+const OPENWEATHER_API_KEY = "64156af705a73616346f38fe66102c21";
 
 // ==========================================
 // OPTION 1: PERMANENT CLOUD MONGODB SYSTEM
@@ -88,8 +91,11 @@ app.post('/api/auth/reset', (req, res) => {
 // REVENUE PIPELINE & OPENWEATHER INTEGRATION
 // ==========================================
 app.post('/api/calculate-trip', async (req, res) => {
-    const { destination, lat, lon, days, targetCurrency, customPackages } = req.body;
-    const lowerDest = destination.toLowerCase();
+    // Destructuring destination from your active client bundle
+    const { destination, days, currency } = req.body;
+    const targetCurrency = currency || 'INR';
+    const searchDestination = destination ? destination.trim() : "Moradabad";
+    const lowerDest = searchDestination.toLowerCase();
     
     let baseRateINR = 4000; 
     let locationNotice = "Standard configuration applied.";
@@ -97,7 +103,7 @@ app.post('/api/calculate-trip', async (req, res) => {
 
     if (lowerDest.includes('india') || lowerDest.includes('moradabad') || lowerDest.includes('delhi')) {
         isInternational = false;
-        if (lowerDest.includes('kashmir') || lowerDest.includes('gulmarg') || lowerDest.includes('uttarakhand')) {
+        if (lowerDest.includes('kashmir') || lowerDest.includes('gulmarg') || lowerDest.includes('uttarakhand') || lowerDest.includes('srinagar')) {
             baseRateINR = 5500;
             locationNotice = "High-altitude sub-continent sector configuration verified.";
         }
@@ -109,63 +115,55 @@ app.post('/api/calculate-trip', async (req, res) => {
         }
     }
 
-    let weatherTelemetry = { temp: 28, condition: "Clear Sky", advice: "Light cotton layering" };
+    // UPDATED: Dynamic Live Geopolitical Climate Lookup Channel via OpenWeatherMap
+    let weatherTelemetry = { temp: 28, condition: "Clear Sky" };
     try {
-        const weatherFetch = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+        const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(searchDestination)}&units=metric&appid=${OPENWEATHER_API_KEY}`;
+        const weatherFetch = await fetch(weatherUrl);
         const weatherJSON = await weatherFetch.json();
         
-        if (weatherJSON && weatherJSON.current_weather) {
-            const currentTemp = Math.round(weatherJSON.current_weather.temperature);
-            let apparelAdvice = "Breathable smart casual styling";
-            let cond = "Overcast Clouds";
+        if (weatherJSON && weatherJSON.main && weatherJSON.weather) {
+            const currentTemp = Math.round(weatherJSON.main.temp);
+            const conditionText = weatherJSON.weather[0] ? weatherJSON.weather[0].description : "Clear Sky";
             
-            if (currentTemp > 32) {
-                apparelAdvice = "Extreme High Temperature: Packing high-breathability ultra-light linen shirts, premium sunglasses, and smart loafers is highly critical.";
-                cond = "Sunny Sky / Intense Heat";
-            } else if (currentTemp < 15) {
-                apparelAdvice = "Cold Climate Alert: Packing heavy-knit premium layer sweaters, structured trench overcoats, and leather tracking boots is highly mandatory.";
-                cond = "Chilly Winds / Cold Air";
-            } else {
-                apparelAdvice = "Optimal Balanced Weather: Perfect for crisp linen fabrics, lightweight knit blazers, Gurkha trousers, and classic pathani suit elements.";
-            }
-
-            weatherTelemetry = { temp: currentTemp, condition: cond, advice: apparelAdvice };
+            // Capitalize condition text nicely
+            const formattedCondition = conditionText.replace(/\b\w/g, c => c.toUpperCase());
+            weatherTelemetry = { 
+                temp: currentTemp, 
+                condition: formattedCondition 
+            };
+            console.log(`[OpenWeather Sync] Successfully fetched live data for ${searchDestination}: ${currentTemp}°C`);
+        } else {
+            console.log(`[OpenWeather Warning] Location not explicitly tracked by API, applying region safety defaults.`);
+            weatherTelemetry = { temp: 24, condition: "Clear Overcast" };
         }
     } catch (weatherErr) {
-        console.log("Weather API relay channel offline, using default region metrics fallback index: ", weatherErr);
+        console.log("Weather API relay channel offline, using default fallback metrics: ", weatherErr);
     }
 
-    const dailyBaseCostINR = baseRateINR * (days || 1);
-    let packageAddonsINR = 0;
-    if (customPackages) {
-        if (customPackages.flight) packageAddonsINR += isInternational ? 65000 : 8500;
-        if (customPackages.hotel) packageAddonsINR += (isInternational ? 18000 : 6500) * (days || 1);
-    }
-
-    const finalTotalINR = dailyBaseCostINR + packageAddonsINR;
-    let finalDailyRate = baseRateINR; let finalTotalCost = finalTotalINR;
+    const dailyBaseCostINR = baseRateINR * (parseInt(days) || 1);
+    const finalTotalINR = dailyBaseCostINR; 
+    let finalTotalCost = finalTotalINR;
 
     if (targetCurrency !== 'INR') {
         try {
             const apiResponse = await fetch('https://open.er-api.com/v6/latest/INR');
             const currencyData = await apiResponse.json();
             if (currencyData?.rates?.[targetCurrency]) {
-                finalDailyRate = Math.round(baseRateINR * currencyData.rates[targetCurrency]);
                 finalTotalCost = Math.round(finalTotalINR * currencyData.rates[targetCurrency]);
             }
         } catch (err) {
             const fallbacks = { USD: 0.012, EUR: 0.011, GBP: 0.0094, AED: 0.044 };
-            finalDailyRate = Math.round(baseRateINR * (fallbacks[targetCurrency] || 1));
             finalTotalCost = Math.round(finalTotalINR * (fallbacks[targetCurrency] || 1));
         }
     }
 
     res.json({
         success: true,
+        destination: searchDestination,
         currency: targetCurrency,
-        symbol: currencySymbols[targetCurrency] || '',
-        ratePerDay: finalDailyRate.toLocaleString(),
-        totalCost: finalTotalCost.toLocaleString(),
+        symbol: currencySymbols[targetCurrency] || '₹',
+        totalCost: finalTotalCost,
         locationNotice: locationNotice,
         weather: weatherTelemetry
     });
